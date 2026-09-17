@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="PurchasePostsCreditTest">
+        <annotations>
+            <features value="QuickConsultCredit"/>
+            <stories value="Purchase posts credit"/>
+            <title value="A qualifying purchase posts credit to the customer's balance exactly once"/>
+            <description value="Add the Quick Consult Credit product to the cart with a quantity, complete checkout as a registered customer, generate an invoice, and verify the balance via the REST API (QCC-PURCHASE-001/002, quickstart Scenario 1)."/>
+            <severity value="CRITICAL"/>
+            <group value="quick_consult_credit"/>
+        </annotations>
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+
+            <createData entity="SimpleSubCategory" stepKey="createCategory"/>
+            <createData entity="_defaultProduct" stepKey="createCreditProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+            <createData entity="Simple_US_Customer" stepKey="createCustomer"/>
+
+            <!-- QCC-CONFIG-001/002: enable the module and point it at the fixture product's SKU -->
+            <magentoCLI command="config:set quick_consult_credit/general/enabled 1" stepKey="enableModule"/>
+            <magentoCLI command="config:set quick_consult_credit/general/product_sku {$createCreditProduct.sku}" stepKey="setCreditProductSku"/>
+            <magentoCLI command="cache:flush" stepKey="flushCacheAfterConfig"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set quick_consult_credit/general/enabled 0" stepKey="disableModule"/>
+            <magentoCLI command="cache:flush" stepKey="flushCacheAfterReset"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createCreditProduct" stepKey="deleteCreditProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logOutAdmin"/>
+        </after>
+
+        <!-- Registered-customer checkout: guest checkout is prevented for this product (QCC-PROD-004) -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsCustomer">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <amOnPage url="{{StorefrontProductPage.url($$createCreditProduct.custom_attributes[url_key]$$)}}" stepKey="goToProductPage"/>
+        <waitForPageLoad stepKey="waitForProductPage"/>
+        <fillField selector="{{StorefrontProductInfoMainSection.qtyInput}}" userInput="2" stepKey="fillQty"/>
+        <click selector="{{StorefrontProductPageSection.addToCart}}" stepKey="addToCart"/>
+        <waitForElementVisible selector="{{StorefrontMessagesSection.success}}" stepKey="waitForAddToCartSuccess"/>
+
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckout"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectCheckMoneyOrder"/>
+        <actionGroup ref="CheckoutPlaceOrderActionGroup" stepKey="placeOrder">
+            <argument name="orderNumberMessage" value="CONST.successCheckoutOrderNumberMessage"/>
+            <argument name="emailYouMessage" value="CONST.successCheckoutEmailYouMessage"/>
+        </actionGroup>
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber}}" stepKey="grabOrderNumber"/>
+
+        <!-- Admin generates the invoice — this is the configured qualifying condition (QCC-CONFIG-003 default) -->
+        <actionGroup ref="AdminOrdersPageOpenActionGroup" stepKey="onOrdersPage"/>
+        <actionGroup ref="FilterOrderGridByIdActionGroup" stepKey="filterOrderGridById">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <actionGroup ref="AdminOrderGridClickFirstRowActionGroup" stepKey="clickOrderRow"/>
+        <actionGroup ref="GoToInvoiceIntoOrderActionGroup" stepKey="goToInvoicePage"/>
+        <actionGroup ref="SubmitInvoiceActionGroup" stepKey="submitInvoice"/>
+
+        <!-- QCC-PURCHASE-002: 2 units posted -> balance of 2 -->
+        <getData entity="CreditBalanceGetter" stepKey="getBalance">
+            <requiredEntity createDataKey="createCustomer"/>
+        </getData>
+        <assertEquals stepKey="assertBalance">
+            <actualResult type="const">$getBalance.balance$</actualResult>
+            <expectedResult type="const">2</expectedResult>
+        </assertEquals>
+    </test>
+</tests>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="CustomerDashboardTest">
+        <annotations>
+            <features value="QuickConsultCredit"/>
+            <stories value="Customer dashboard"/>
+            <title value="Customer dashboard displays own balance/history, paginated, and never another customer's data"/>
+            <description value="Verify current balance and paginated, correctly ordered transaction history display in My Account, and that another customer's data is never shown (QCC-CUSTOMER-002/003/004/006, quickstart Scenario 4)."/>
+            <severity value="CRITICAL"/>
+            <group value="quick_consult_credit"/>
+        </annotations>
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+
+            <createData entity="Simple_US_Customer" stepKey="createCustomerA"/>
+            <createData entity="Simple_US_Customer" stepKey="createCustomerB"/>
+
+            <!-- QCC-CONFIG-004: force a page size of 1 so 2 ledger entries paginate across 2 pages -->
+            <magentoCLI command="config:set quick_consult_credit/general/history_page_size 1" stepKey="setSmallPageSize"/>
+            <magentoCLI command="cache:flush" stepKey="flushCacheAfterConfig"/>
+        </before>
+        <after>
+            <magentoCLI command="config:set quick_consult_credit/general/history_page_size 20" stepKey="resetPageSize"/>
+            <magentoCLI command="cache:flush" stepKey="flushCacheAfterReset"/>
+            <deleteData createDataKey="createCustomerB" stepKey="deleteCustomerB"/>
+            <deleteData createDataKey="createCustomerA" stepKey="deleteCustomerA"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logOutAdmin"/>
+        </after>
+
+        <!--
+            Seed two REDEEM-able PURCHASE credits for Customer A only, via the Admin
+            "Add Credit" adjustment (built by User Story 3) so the dashboard has two
+            distinct, orderable ledger rows to paginate across (QCC-CUSTOMER-003/004).
+        -->
+        <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerAEditPage">
+            <argument name="customerId" value="$$createCustomerA.id$$"/>
+        </actionGroup>
+        <actionGroup ref="AdminAddQuickConsultCreditActionGroup" stepKey="addFirstCredit">
+            <argument name="amount" value="5"/>
+            <argument name="message" value="First consultation credit"/>
+        </actionGroup>
+        <actionGroup ref="AdminAddQuickConsultCreditActionGroup" stepKey="addSecondCredit">
+            <argument name="amount" value="7"/>
+            <argument name="message" value="Second consultation credit"/>
+        </actionGroup>
+
+        <!-- Customer A sees their own balance and history, paginated across 2 pages -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsCustomerA">
+            <argument name="Customer" value="$$createCustomerA$$"/>
+        </actionGroup>
+        <amOnPage url="quickconsultcredit/account/index" stepKey="goToCustomerADashboard"/>
+        <waitForPageLoad stepKey="waitForCustomerADashboard"/>
+        <see selector=".qcc-balance" userInput="12" stepKey="seeCustomerABalance"/>
+        <see selector="#qcc-transaction-history" userInput="Second consultation credit" stepKey="seeMostRecentEntryOnPageOne"/>
+        <dontSee selector="#qcc-transaction-history" userInput="First consultation credit" stepKey="dontSeeOlderEntryOnPageOne"/>
+        <click selector=".qcc-pagination a.page" stepKey="goToPageTwo"/>
+        <waitForPageLoad stepKey="waitForPageTwo"/>
+        <see selector="#qcc-transaction-history" userInput="First consultation credit" stepKey="seeOlderEntryOnPageTwo"/>
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomerA"/>
+
+        <!-- Customer B has no balance and no visibility into Customer A's history -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsCustomerB">
+            <argument name="Customer" value="$$createCustomerB$$"/>
+        </actionGroup>
+        <amOnPage url="quickconsultcredit/account/index" stepKey="goToCustomerBDashboard"/>
+        <waitForPageLoad stepKey="waitForCustomerBDashboard"/>
+        <see selector=".qcc-balance" userInput="0" stepKey="seeCustomerBZeroBalance"/>
+        <dontSee selector=".block-quick-consult-credit" userInput="First consultation credit" stepKey="dontSeeCustomerAEntry1"/>
+        <dontSee selector=".block-quick-consult-credit" userInput="Second consultation credit" stepKey="dontSeeCustomerAEntry2"/>
+        <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomerB"/>
+    </test>
+</tests>

@@ -1,0 +1,82 @@
+<?php
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @var \ICC\QuickConsultCredit\Block\Account\Credit $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$transactions = $block->getTransactions();
+$currentPage = $block->getCurrentPage();
+$lastPage = $block->getLastPageNumber();
+?>
+<div class="block block-quick-consult-credit">
+    <div class="block-title">
+        <strong><?= $escaper->escapeHtml(__('Quick Consult Credit')) ?></strong>
+    </div>
+    <div class="block-content">
+        <p class="qcc-balance">
+            <?= $escaper->escapeHtml(__('Current Balance:')) ?>
+            <strong><?= $escaper->escapeHtml($block->getBalance()) ?></strong>
+        </p>
+
+        <?php if (empty($transactions)): ?>
+            <div class="message info empty">
+                <span><?= $escaper->escapeHtml(__('You have no Quick Consult Credit transactions yet.')) ?></span>
+            </div>
+        <?php else: ?>
+            <table class="data table table-order-items qcc-transaction-history" id="qcc-transaction-history">
+                <caption class="table-caption"><?= $escaper->escapeHtml(__('Transaction History')) ?></caption>
+                <thead>
+                    <tr>
+                        <th scope="col" class="col date"><?= $escaper->escapeHtml(__('Date')) ?></th>
+                        <th scope="col" class="col type"><?= $escaper->escapeHtml(__('Type')) ?></th>
+                        <th scope="col" class="col amount"><?= $escaper->escapeHtml(__('Amount')) ?></th>
+                        <th scope="col" class="col balance"><?= $escaper->escapeHtml(__('Balance')) ?></th>
+                        <th scope="col" class="col message"><?= $escaper->escapeHtml(__('Message')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($transactions as $transaction): ?>
+                        <tr>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Date')) ?>" class="col date">
+                                <?= $escaper->escapeHtml($block->formatDate($transaction->getCreatedAt(), \IntlDateFormatter::MEDIUM, true)) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Type')) ?>" class="col type">
+                                <?= $escaper->escapeHtml($transaction->getTransactionType()) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Amount')) ?>" class="col amount">
+                                <?= $transaction->getDirection() === \ICC\QuickConsultCredit\Api\Data\CreditTransactionInterface::DIRECTION_DEBIT ? '-' : '+' ?><?= $escaper->escapeHtml($transaction->getAmount()) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Balance')) ?>" class="col balance">
+                                <?= $escaper->escapeHtml($transaction->getBalanceAfter()) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Message')) ?>" class="col message">
+                                <?= $escaper->escapeHtml($transaction->getMessage()) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <?php if ($lastPage > 1): ?>
+                <div class="qcc-pagination pages">
+                    <ul class="items pages-items">
+                        <?php for ($page = 1; $page <= $lastPage; $page++): ?>
+                            <li class="item page-item<?= $page === $currentPage ? ' current' : '' ?>">
+                                <?php if ($page === $currentPage): ?>
+                                    <strong class="page current"><?= $escaper->escapeHtml($page) ?></strong>
+                                <?php else: ?>
+                                    <a class="page"
+                                       href="<?= $escaper->escapeUrl($block->getTransactionsPageUrl($page)) ?>">
+                                        <?= $escaper->escapeHtml($page) ?>
+                                    </a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endfor; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>

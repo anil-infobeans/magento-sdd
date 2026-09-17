@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Service-contract preferences (QCC-DATA-007/008): the sole implementations behind Api/* -->
+    <preference for="ICC\QuickConsultCredit\Api\CreditBalanceManagementInterface"
+                type="ICC\QuickConsultCredit\Model\Service\CreditBalanceManagement"/>
+    <preference for="ICC\QuickConsultCredit\Api\CreditTransactionManagementInterface"
+                type="ICC\QuickConsultCredit\Model\Service\CreditTransactionManagement"/>
+    <preference for="ICC\QuickConsultCredit\Api\CreditLedgerInterface"
+                type="ICC\QuickConsultCredit\Model\Service\CreditLedger"/>
+
+    <!-- Data contract preferences -->
+    <preference for="ICC\QuickConsultCredit\Api\Data\CreditBalanceInterface"
+                type="ICC\QuickConsultCredit\Model\CreditBalance"/>
+    <preference for="ICC\QuickConsultCredit\Api\Data\CreditTransactionInterface"
+                type="ICC\QuickConsultCredit\Model\CreditTransaction"/>
+    <preference for="ICC\QuickConsultCredit\Api\Data\CreditTransactionSearchResultsInterface"
+                type="ICC\QuickConsultCredit\Model\CreditTransactionSearchResults"/>
+
+    <!--
+        Adds the standardized `{ success, error_code, message }` REST error payload
+        (QCC-API-012) only for this module's own exceptions; identical to core for every
+        other exception (see class docblock for rationale).
+    -->
+    <preference for="Magento\Framework\Webapi\Rest\Response"
+                type="ICC\QuickConsultCredit\Model\Webapi\Rest\Response"/>
+
+    <type name="Magento\Framework\Webapi\Authorization">
+        <plugin name="qcc_webapi_authorization"
+                type="ICC\QuickConsultCredit\Plugin\Webapi\AuthorizationPlugin"/>
+    </type>
+
+    <!-- QCC-PROD-004: reject guest checkout completion for the Quick Consult Credit product -->
+    <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
+        <plugin name="qcc_prevent_guest_checkout"
+                type="ICC\QuickConsultCredit\Plugin\Checkout\PreventGuestCheckoutForCreditProductPlugin"/>
+    </type>
+</config>

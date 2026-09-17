@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- QCC-PROD-005/006/007/008, QCC-PURCHASE-003..008: fires only once an invoice is saved -->
+    <event name="sales_order_invoice_save_after">
+        <observer name="icc_quickconsultcredit_order_credit_post" instance="ICC\QuickConsultCredit\Observer\OrderCreditPost"/>
+    </event>
+</config>

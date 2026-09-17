@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<operations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataOperation.xsd">
+    <!--
+        QCC-PURCHASE-001/002: used by PurchasePostsCreditTest to verify the customer's
+        balance via the REST API after invoicing, rather than only via the UI.
+    -->
+    <operation name="GetCreditBalance" dataType="CreditBalance" type="get" auth="adminOauth" url="/V1/quick-consult-credit/balance/{customer_id}" method="GET">
+        <contentType>application/json</contentType>
+    </operation>
+</operations>

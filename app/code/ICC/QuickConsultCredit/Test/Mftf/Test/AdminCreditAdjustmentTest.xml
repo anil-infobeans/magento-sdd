@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminCreditAdjustmentTest">
+        <annotations>
+            <features value="QuickConsultCredit"/>
+            <stories value="Admin credit adjustment"/>
+            <title value="Administrator can add/remove credit with a mandatory reason, and unauthorized actions are rejected"/>
+            <description value="Covers authorized Add Credit, authorized Remove Credit, insufficient-balance removal rejection, missing-reason rejection, and unauthorized-administrator rejection (QCC-ADMIN-003/004/005/009, quickstart Scenario 5)."/>
+            <severity value="CRITICAL"/>
+            <group value="quick_consult_credit"/>
+        </annotations>
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+            <createData entity="Simple_US_Customer" stepKey="createCustomer"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logOutAdmin"/>
+        </after>
+
+        <!-- Authorized Add Credit (QCC-ADMIN-003/006/007) -->
+        <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="openCustomerEditPageForAdd">
+            <argument name="customerId" value="$$createCustomer.id$$"/>
+        </actionGroup>
+        <actionGroup ref="AdminAddQuickConsultCreditActionGroup" stepKey="addCredit">
+            <argument name="amount" value="20"/>
+            <argument name="message" value="Initial goodwill credit"/>
+        </actionGroup>
+        <actionGroup ref="AssertMessageInAdminPanelActionGroup" stepKey="assertAddSuccessMessage">
+            <argument name="message" value="The Quick Consult Credit adjustment was saved."/>
+        </actionGroup>
+        <see selector="#qcc-admin-balance" userInput="20" stepKey="seeBalanceAfterAdd"/>
+        <see selector="#qcc-admin-transaction-history" userInput="admin" stepKey="seeAdministratorIdentityAfterAdd"/>
+        <see selector="#qcc-admin-transaction-history" userInput="Initial goodwill credit" stepKey="seeReasonAfterAdd"/>
+
+        <!-- Authorized Remove Credit (QCC-ADMIN-004/006/007) -->
+        <actionGroup ref="AdminRemoveQuickConsultCreditActionGroup" stepKey="removeCredit">
+            <argument name="amount" value="5"/>
+            <argument name="message" value="Correction of duplicate credit"/>
+        </actionGroup>
+        <actionGroup ref="AssertMessageInAdminPanelActionGroup" stepKey="assertRemoveSuccessMessage">
+            <argument name="message" value="The Quick Consult Credit adjustment was saved."/>
+        </actionGroup>
+        <see selector="#qcc-admin-balance" userInput="15" stepKey="seeBalanceAfterRemove"/>
+        <see selector="#qcc-admin-transaction-history" userInput="Correction of duplicate credit" stepKey="seeReasonAfterRemove"/>
+
+        <!-- Insufficient-balance removal rejection (QCC-ADMIN-006) -->
+        <actionGroup ref="AdminRemoveQuickConsultCreditActionGroup" stepKey="attemptOverRemoval">
+            <argument name="amount" value="999"/>
+            <argument name="message" value="Attempted over-removal"/>
+        </actionGroup>
+        <dontSee selector="#qcc-admin-balance" userInput="0" stepKey="dontSeeZeroBalanceAfterRejectedRemoval"/>
+        <see selector="#qcc-admin-balance" userInput="15" stepKey="seeBalanceUnchangedAfterRejectedRemoval"/>
+
+        <!-- Missing-reason rejection (QCC-ADMIN-005, QCC-LEDGER-004): bypass the
+             client-side "required" attribute so the server-side rejection itself is
+             exercised, not merely the browser's own form validation. -->
+        <executeJS function="document.getElementById('qcc-reason').removeAttribute('required')" stepKey="removeReasonRequiredAttribute"/>
+        <selectOption selector="#qcc-action" userInput="add" stepKey="selectAddActionForMissingReason"/>
+        <fillField selector="#qcc-amount" userInput="10" stepKey="fillAmountForMissingReason"/>
+        <fillField selector="#qcc-reason" userInput="" stepKey="clearReasonForMissingReason"/>
+        <click selector="#qcc-admin-adjustment-form button.action-primary" stepKey="submitWithMissingReason"/>
+        <waitForPageLoad stepKey="waitForMissingReasonReload"/>
+        <see selector="#qcc-admin-balance" userInput="15" stepKey="seeBalanceUnchangedAfterMissingReason"/>
+
+        <!-- Unauthorized-administrator rejection (QCC-ADMIN-009) -->
+        <actionGroup ref="AdminOpenCreateRolePageActionGroup" stepKey="goToNewRolePage"/>
+        <actionGroup ref="AdminFillUserRoleFormActionGroup" stepKey="fillRestrictedRoleForm">
+            <argument name="role" value="RoleWithoutQuickConsultCreditManage"/>
+        </actionGroup>
+        <actionGroup ref="AdminSelectUserRoleResourceActionGroup" stepKey="selectCustomerResource">
+            <argument name="resourceId" value="Magento_Customer::customer"/>
+        </actionGroup>
+        <actionGroup ref="AdminSelectUserRoleResourceActionGroup" stepKey="selectCustomerManageResource">
+            <argument name="resourceId" value="Magento_Customer::manage"/>
+        </actionGroup>
+        <actionGroup ref="AdminClickSaveButtonOnUserRoleFormActionGroup" stepKey="saveRestrictedRole"/>
+        <actionGroup ref="AdminCreateUserWithRoleActionGroup" stepKey="createRestrictedUser">
+            <argument name="role" value="RoleWithoutQuickConsultCreditManage"/>
+            <argument name="user" value="activeAdmin"/>
+        </actionGroup>
+
+        <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutOfPrimaryAdmin"/>
+        <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsRestrictedUser">
+            <argument name="username" value="{{activeAdmin.username}}"/>
+            <argument name="password" value="{{activeAdmin.password}}"/>
+        </actionGroup>
+
+        <!-- The Quick Consult Credit tab is not rendered without the ACL resource -->
+        <actionGroup ref="AdminOpenCustomerEditPageActionGroup" stepKey="restrictedUserOpensCustomerEditPage">
+            <argument name="customerId" value="$$createCustomer.id$$"/>
+        </actionGroup>
+        <dontSeeElement selector="#quickconsultcredit-tab" stepKey="dontSeeCreditTabForRestrictedUser"/>
+
+        <!-- Direct navigation to the Save controller is also rejected (QCC-ADMIN-008/009) -->
+        <amOnPage url="admin/quickconsultcredit/customer_credit/save" stepKey="restrictedUserAttemptsDirectSave"/>
+        <actionGroup ref="AssertUserRoleRestrictedAccessActionGroup" stepKey="assertAccessDeniedForRestrictedUser"/>
+
+        <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutRestrictedUser"/>
+        <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsPrimaryAdminForCleanup"/>
+        <actionGroup ref="AdminDeleteCustomUserActionGroup" stepKey="deleteRestrictedUser">
+            <argument name="user" value="activeAdmin"/>
+        </actionGroup>
+        <actionGroup ref="AdminDeleteUserRoleActionGroup" stepKey="deleteRestrictedRole">
+            <argument name="roleName" value="{{RoleWithoutQuickConsultCreditManage.rolename}}"/>
+        </actionGroup>
+    </test>
+</tests>

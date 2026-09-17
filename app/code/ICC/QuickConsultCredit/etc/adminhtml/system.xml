@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="icc" translate="label" sortOrder="200">
+            <label>ICC</label>
+        </tab>
+        <section id="quick_consult_credit" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Quick Consult Credit</label>
+            <tab>icc</tab>
+            <resource>ICC_QuickConsultCredit::credit</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <!-- QCC-CONFIG-001 -->
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Quick Consult Credit</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!-- QCC-CONFIG-002 -->
+                <field id="product_sku" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Credit Product SKU</label>
+                    <comment>The SKU of the Quick Consult Credit catalog product, assigned to the Consultation Services attribute set.</comment>
+                </field>
+                <!-- QCC-CONFIG-003 -->
+                <field id="qualifying_condition" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Qualifying Order/Payment Condition</label>
+                    <comment>Determines when a purchase posts credit. Default per CLA-003: invoice generated / payment captured.</comment>
+                    <source_model>ICC\QuickConsultCredit\Model\Config\Source\QualifyingCondition</source_model>
+                </field>
+                <!-- QCC-CONFIG-004 -->
+                <field id="history_page_size" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Customer Transaction History Page Size</label>
+                    <comment>Number of ledger rows shown per page in the My Account Quick Consult Credit history (default 20).</comment>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

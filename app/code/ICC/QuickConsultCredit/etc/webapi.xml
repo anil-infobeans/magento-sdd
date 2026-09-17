@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!--
+        QCC-API-001..004, QCC-API-009: balance lookup.
+        `self` grants any authenticated customer token access to their own customerId only;
+        the AuthorizationPlugin escalates admin/integration "self" ACL failures to check
+        ICC_QuickConsultCredit::credit, since native webapi ACL has no OR semantics.
+    -->
+    <route url="/V1/quick-consult-credit/balance/:customerId" method="GET">
+        <service class="ICC\QuickConsultCredit\Api\CreditBalanceManagementInterface" method="getBalance"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="false"/>
+        </data>
+    </route>
+
+    <!--
+        QCC-API-005, QCC-API-017, QCC-API-019: redemption-only transaction creation.
+        Restricted to integration/admin ACL callers only (CLA-007 resolved) — no
+        customer self-access.
+    -->
+    <route url="/V1/quick-consult-credit/transactions" method="POST">
+        <service class="ICC\QuickConsultCredit\Api\CreditTransactionManagementInterface" method="createTransaction"/>
+        <resources>
+            <resource ref="ICC_QuickConsultCredit::manage"/>
+        </resources>
+    </route>
+</routes>

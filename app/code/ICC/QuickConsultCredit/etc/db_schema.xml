@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!-- QCC-ACCOUNT-001/003/004/006/007: materialized per-customer credit balance -->
+    <table name="qcc_customer_credit" resource="default" engine="innodb"
+           comment="Quick Consult Credit - Customer Credit Account">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID"/>
+        <column xsi:type="int" name="balance" unsigned="true" nullable="false" default="0"
+                comment="Current Balance (whole-number credit points, never negative)"/>
+        <column xsi:type="int" name="total_credited" unsigned="true" nullable="false" default="0"
+                comment="Lifetime Cumulative Credited Total"/>
+        <column xsi:type="int" name="total_debited" unsigned="true" nullable="false" default="0"
+                comment="Lifetime Cumulative Debited Total"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="QCC_CUSTOMER_CREDIT_CUSTOMER_ID">
+            <column name="customer_id"/>
+        </constraint>
+    </table>
+
+    <!-- QCC-LEDGER-001..009: immutable, append-only transaction ledger -->
+    <table name="qcc_credit_transaction" resource="default" engine="innodb"
+           comment="Quick Consult Credit - Credit Transaction Ledger">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID"/>
+        <column xsi:type="varchar" name="transaction_type" nullable="false" length="32"
+                comment="Transaction Type: PURCHASE, REDEEM, ADMIN_ADD, ADMIN_REMOVE"/>
+        <column xsi:type="varchar" name="direction" nullable="false" length="16"
+                comment="Direction: CREDIT, DEBIT"/>
+        <column xsi:type="int" name="amount" unsigned="true" nullable="false"
+                comment="Amount (positive whole-number credit points)"/>
+        <column xsi:type="int" name="balance_before" unsigned="true" nullable="false"
+                comment="Balance Before"/>
+        <column xsi:type="int" name="balance_after" unsigned="true" nullable="false"
+                comment="Balance After"/>
+        <column xsi:type="text" name="message" nullable="true"
+                comment="Message (required for ADMIN_ADD/ADMIN_REMOVE)"/>
+        <column xsi:type="varchar" name="source" nullable="false" length="16"
+                comment="Source: CUSTOMER, API, ADMIN, SYSTEM"/>
+        <column xsi:type="varchar" name="created_by" nullable="true" length="255"
+                comment="Administrator or system/integration identifier"/>
+        <column xsi:type="varchar" name="source_reference" nullable="true" length="255"
+                comment="Deterministic purchase reference; unique when present"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At (server-assigned)"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="QCC_CREDIT_TRANSACTION_SOURCE_REFERENCE">
+            <column name="source_reference"/>
+        </constraint>
+        <index referenceId="QCC_CREDIT_TRANSACTION_CUSTOMER_ID_CREATED_AT_ENTITY_ID" indexType="btree">
+            <column name="customer_id"/>
+            <column name="created_at"/>
+            <column name="entity_id"/>
+        </index>
+    </table>
+</schema>

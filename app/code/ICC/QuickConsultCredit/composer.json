@@ -1,0 +1,25 @@
+{
+    "name": "icc/module-quick-consult-credit",
+    "description": "Quick Consult Credit - prepaid, customer-owned consultation credit balance for Magento/Adobe Commerce.",
+    "type": "magento2-module",
+    "license": [
+        "proprietary"
+    ],
+    "require": {
+        "php": "~8.2.0||~8.3.0||~8.4.0",
+        "magento/framework": "*",
+        "magento/module-customer": "*",
+        "magento/module-sales": "*",
+        "magento/module-webapi": "*",
+        "magento/module-backend": "*",
+        "magento/module-authorization": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "ICC\\QuickConsultCredit\\": ""
+        }
+    }
+}

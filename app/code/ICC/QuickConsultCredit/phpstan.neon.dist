@@ -1,0 +1,45 @@
+parameters:
+    level: 5
+    paths:
+        - Api
+        - Block
+        - Controller
+        - Model
+        - Observer
+        - Plugin
+    excludePaths:
+        - Test/*
+    ignoreErrors:
+        # Generated factories (*Factory, Collection) only exist after
+        # `bin/magento setup:di:compile` has run; CI runs that step before this
+        # analysis. Kept as a safety net for local/ad-hoc runs where compile hasn't
+        # been executed.
+        - '#(has unknown class|invalid type|Call to method create\(\) on an unknown class) ICC\\QuickConsultCredit\\(Model\\(CreditBalanceFactory|CreditTransactionFactory|CreditTransactionResultFactory|ResourceModel\\CreditTransaction\\CollectionFactory)|Api\\Data\\CreditTransactionSearchResultsInterfaceFactory)#'
+        # Widespread, accepted Magento convention: __() returns a translatable Phrase,
+        # passed directly to APIs typed/documented as `string` (Page\Title::set(),
+        # ManagerInterface::addSuccessMessage/addErrorMessage, TabInterface::getTabLabel) -
+        # Phrase::__toString() makes this safe at render time; not a real defect.
+        - '#expects string, Magento\\Framework\\Phrase given#'
+        - '#should return string but returns Magento\\Framework\\Phrase#'
+        # Magento\Backend\Model\Auth\Credential\StorageInterface is declared too
+        # narrowly - the real runtime object is always \Magento\User\Model\User,
+        # which does have getUsername(). Widespread, accepted Magento typing gap.
+        - '#Call to an undefined method Magento\\Backend\\Model\\Auth\\Credential\\StorageInterface::getUsername\(\)#'
+        -
+            message: '#Ternary operator condition is always true#'
+            path: Controller/Adminhtml/Customer/Credit/Save.php
+        # CartRepositoryInterface::get() is typed to return CartInterface, but the
+        # real runtime object is always \Magento\Quote\Model\Quote, which does have
+        # getAllVisibleItems(). Widespread, accepted Magento typing gap.
+        - '#Call to an undefined method Magento\\Quote\\Api\\Data\\CartInterface::getAllVisibleItems\(\)#'
+        # Defensive null-check against Order\Item::getOrder()'s optimistic non-null
+        # return type - deliberate (QCC-PROD-004 comment), not dead code.
+        -
+            message: '#Else branch is unreachable because ternary operator condition is always true#'
+            path: Model/Service/CreditPurchaseProcessor.php
+        # CreditTransactionSearchResults narrows SearchResults' generic item type to
+        # this module's own CreditTransactionInterface - an intentional, safe
+        # covariant override (see Model/CreditTransactionSearchResults.php docblock).
+        -
+            message: '~(getItems\(\) should return array<ICC\\QuickConsultCredit\\Api\\Data\\CreditTransactionInterface> but returns array<Magento\\Framework\\Api\\AbstractExtensibleObject>|Parameter #1 \$items of method Magento\\Framework\\Api\\SearchResults::setItems\(\) expects array<Magento\\Framework\\Api\\AbstractExtensibleObject>, array<ICC\\QuickConsultCredit\\Api\\Data\\CreditTransactionInterface> given)~'
+            path: Model/CreditTransactionSearchResults.php

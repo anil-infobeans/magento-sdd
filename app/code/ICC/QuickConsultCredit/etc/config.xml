@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <quick_consult_credit>
+            <general>
+                <enabled>1</enabled>
+                <qualifying_condition>invoice_generated</qualifying_condition>
+                <history_page_size>20</history_page_size>
+            </general>
+        </quick_consult_credit>
+    </default>
+</config>

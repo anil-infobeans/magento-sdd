@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <!-- QCC-ADMIN-001/008: gated by the dedicated ICC_QuickConsultCredit::manage ACL resource -->
+    <htmlContent name="quickconsultcredit_content">
+        <block acl="ICC_QuickConsultCredit::manage"
+               class="ICC\QuickConsultCredit\Block\Adminhtml\Customer\Edit\Tab\Credit"
+               name="quickconsultcredit_credit"/>
+    </htmlContent>
+</form>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9fbcc6057b047890c408244c535c6306",
+    "content-hash": "a92369c41e7a7825f75bf1125db32341",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -509,126 +509,6 @@
                 }
             ],
             "time": "2025-02-20T17:42:39+00:00"
-        },
-        {
-            "name": "cart2quote/module-features",
-            "version": "500.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://bitbucket.org/cart2quote2/cart2quote2-features-releases.git",
-                "reference": "e8fca3e278bc010f78636d9b76fb584d9126e481"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://bitbucket.org/cart2quote2/cart2quote2-features-releases/get/e8fca3e278bc010f78636d9b76fb584d9126e481.zip",
-                "reference": "e8fca3e278bc010f78636d9b76fb584d9126e481",
-                "shasum": ""
-            },
-            "type": "magento2-module",
-            "autoload": {
-                "files": [
-                    "registration.php"
-                ],
-                "psr-4": {
-                    "Cart2Quote\\Features\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "homepage": "https://bitbucket.org/cart2quote2/cart2quote2-features-releases",
-            "support": {
-                "source": "https://bitbucket.org/cart2quote2/cart2quote2-features-releases/src/e8fca3e278bc010f78636d9b76fb584d9126e481/?at=500.0.0"
-            },
-            "time": "2025-09-17T05:19:29+00:00"
-        },
-        {
-            "name": "cart2quote/module-license",
-            "version": "135.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://bitbucket.org/cart2quote2/cart2quote2-license-releases.git",
-                "reference": "e0dcb53a37551281413278e05c92208506c17942"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://bitbucket.org/cart2quote2/cart2quote2-license-releases/get/e0dcb53a37551281413278e05c92208506c17942.zip",
-                "reference": "e0dcb53a37551281413278e05c92208506c17942",
-                "shasum": ""
-            },
-            "type": "magento2-module",
-            "autoload": {
-                "files": [
-                    "registration.php"
-                ],
-                "psr-4": {
-                    "Cart2Quote\\License\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "homepage": "https://bitbucket.org/cart2quote2/cart2quote2-license-releases",
-            "support": {
-                "source": "https://bitbucket.org/cart2quote2/cart2quote2-license-releases/src/e0dcb53a37551281413278e05c92208506c17942/?at=135.0.0"
-            },
-            "time": "2025-10-22T12:20:19+00:00"
-        },
-        {
-            "name": "cart2quote/module-quotation-encoded",
-            "version": "5.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://bitbucket.org/cart2quote2/cart2quote2-releases.git",
-                "reference": "04c43ce621849d031d5656f7308a1606be9ad4ca"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://bitbucket.org/cart2quote2/cart2quote2-releases/get/04c43ce621849d031d5656f7308a1606be9ad4ca.zip",
-                "reference": "04c43ce621849d031d5656f7308a1606be9ad4ca",
-                "shasum": ""
-            },
-            "require": {
-                "cart2quote/module-features": "^500.0.0",
-                "cart2quote/module-license": ">=130",
-                "ext-gd": "*",
-                "ext-imagick": "*",
-                "ext-intl": "*",
-                "ext-json": "*",
-                "ext-simplexml": "*",
-                "magento/framework": "^103.0",
-                "magento/module-backend": "^102.0",
-                "magento/module-catalog": "^104.0",
-                "magento/module-customer": "^103.0",
-                "magento/module-sales": "^103.0",
-                "php": "^8.2 || ^8.3 || ^8.4"
-            },
-            "conflict": {
-                "magento/magento2-base": "<2.4.7",
-                "magento/product-community-edition": "<2.4.7",
-                "magento/product-enterprise-edition": "<2.4.7"
-            },
-            "type": "magento2-module",
-            "autoload": {
-                "files": [
-                    "registration.php"
-                ],
-                "psr-4": {
-                    "Cart2Quote\\Quotation\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "description": "Complete Request for Quote (RFQ) solution. Manage and create quote requests via the front-end or backend. Cart2Quote Ordering & Licenses: https://www.cart2quote.com/ordering-licenses",
-            "homepage": "https://bitbucket.org/cart2quote2/cart2quote2-releases",
-            "support": {
-                "source": "https://bitbucket.org/cart2quote2/cart2quote2-releases/src/04c43ce621849d031d5656f7308a1606be9ad4ca/?at=5.0.0"
-            },
-            "time": "2025-09-17T05:18:52+00:00"
         },
         {
             "name": "christian-riesen/base32",

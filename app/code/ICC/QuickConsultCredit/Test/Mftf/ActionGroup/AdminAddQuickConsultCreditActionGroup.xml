@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="AdminAddQuickConsultCreditActionGroup">
+        <annotations>
+            <description>On an already-open Admin customer edit page, selects "Add Credit" in the Quick Consult
+                Credit tab, fills the amount and reason, and submits the adjustment form (QCC-ADMIN-003/005).</description>
+        </annotations>
+        <arguments>
+            <argument name="amount" type="string"/>
+            <argument name="message" type="string"/>
+        </arguments>
+
+        <scrollTo selector="#quickconsultcredit-tab" stepKey="scrollToCreditTab"/>
+        <waitForElementVisible selector="#qcc-admin-adjustment-form" stepKey="waitForAdjustmentForm"/>
+        <selectOption selector="#qcc-action" userInput="add" stepKey="selectAddAction"/>
+        <fillField selector="#qcc-amount" userInput="{{amount}}" stepKey="fillAmount"/>
+        <fillField selector="#qcc-reason" userInput="{{message}}" stepKey="fillReason"/>
+        <click selector="#qcc-admin-adjustment-form button.action-primary" stepKey="submitAdjustment"/>
+        <waitForPageLoad stepKey="waitForSubmitReload"/>
+    </actionGroup>
+</actionGroups>

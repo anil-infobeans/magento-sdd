@@ -1,0 +1,101 @@
+<?php
+/**
+ * Copyright © ICC. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @var \ICC\QuickConsultCredit\Block\Adminhtml\Customer\Edit\Tab\Credit $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$transactions = $block->getTransactions();
+?>
+<div class="admin__fieldset-wrapper" id="quickconsultcredit-tab">
+    <div class="admin__fieldset-wrapper-title">
+        <strong><?= $escaper->escapeHtml(__('Quick Consult Credit')) ?></strong>
+    </div>
+    <fieldset class="admin__fieldset">
+        <div class="admin__field">
+            <label class="admin__field-label"><?= $escaper->escapeHtml(__('Current Balance')) ?></label>
+            <div class="admin__field-control" id="qcc-admin-balance"><?= $escaper->escapeHtml($block->getBalance()) ?></div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><?= $escaper->escapeHtml(__('Lifetime Credited')) ?></label>
+            <div class="admin__field-control"><?= $escaper->escapeHtml($block->getTotalCredited()) ?></div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label"><?= $escaper->escapeHtml(__('Lifetime Debited')) ?></label>
+            <div class="admin__field-control"><?= $escaper->escapeHtml($block->getTotalDebited()) ?></div>
+        </div>
+    </fieldset>
+
+    <fieldset class="admin__fieldset">
+        <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Add / Remove Credit')) ?></span></legend>
+        <form id="qcc-admin-adjustment-form" action="<?= $escaper->escapeUrl($block->getSaveUrl()) ?>" method="post">
+            <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
+            <div class="admin__field">
+                <label class="admin__field-label" for="qcc-action"><?= $escaper->escapeHtml(__('Action')) ?></label>
+                <div class="admin__field-control">
+                    <select id="qcc-action" name="action" class="admin__control-select">
+                        <option value="add"><?= $escaper->escapeHtml(__('Add Credit')) ?></option>
+                        <option value="remove"><?= $escaper->escapeHtml(__('Remove Credit')) ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="admin__field _required">
+                <label class="admin__field-label" for="qcc-amount"><?= $escaper->escapeHtml(__('Amount')) ?></label>
+                <div class="admin__field-control">
+                    <input type="number" min="1" step="1" id="qcc-amount" name="amount" class="admin__control-text" required="required"/>
+                </div>
+            </div>
+            <div class="admin__field _required">
+                <label class="admin__field-label" for="qcc-reason"><?= $escaper->escapeHtml(__('Reason')) ?></label>
+                <div class="admin__field-control">
+                    <textarea id="qcc-reason" name="message" class="admin__control-textarea" required="required"></textarea>
+                </div>
+            </div>
+            <div class="admin__field">
+                <button type="submit" class="action-primary">
+                    <span><?= $escaper->escapeHtml(__('Submit')) ?></span>
+                </button>
+            </div>
+        </form>
+    </fieldset>
+
+    <fieldset class="admin__fieldset">
+        <legend class="admin__legend"><span><?= $escaper->escapeHtml(__('Transaction History')) ?></span></legend>
+        <?php if (empty($transactions)): ?>
+            <div class="message info empty">
+                <span><?= $escaper->escapeHtml(__('No Quick Consult Credit transactions yet.')) ?></span>
+            </div>
+        <?php else: ?>
+            <table class="data-grid" id="qcc-admin-transaction-history">
+                <thead>
+                    <tr class="data-grid-tr">
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Date')) ?></th>
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Type')) ?></th>
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Amount')) ?></th>
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Balance')) ?></th>
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Source')) ?></th>
+                        <!-- QCC-AUDIT-002/003: administrator identity and reason for every admin adjustment -->
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Administrator')) ?></th>
+                        <th class="data-grid-th"><?= $escaper->escapeHtml(__('Reason / Message')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($transactions as $transaction): ?>
+                        <tr class="data-grid-tr">
+                            <td class="data-grid-td"><?= $escaper->escapeHtml($block->formatDate($transaction->getCreatedAt(), \IntlDateFormatter::MEDIUM, true)) ?></td>
+                            <td class="data-grid-td"><?= $escaper->escapeHtml($transaction->getTransactionType()) ?></td>
+                            <td class="data-grid-td">
+                                <?= $transaction->getDirection() === \ICC\QuickConsultCredit\Api\Data\CreditTransactionInterface::DIRECTION_DEBIT ? '-' : '+' ?><?= $escaper->escapeHtml($transaction->getAmount()) ?>
+                            </td>
+                            <td class="data-grid-td"><?= $escaper->escapeHtml($transaction->getBalanceAfter()) ?></td>
+                            <td class="data-grid-td"><?= $escaper->escapeHtml($transaction->getSource()) ?></td>
+                            <td class="data-grid-td"><?= $escaper->escapeHtml($transaction->getCreatedBy()) ?></td>
+                            <td class="data-grid-td"><?= $escaper->escapeHtml($transaction->getMessage()) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </fieldset>
+</div>
