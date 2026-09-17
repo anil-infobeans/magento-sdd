@@ -1,7 +1,7 @@
 # Specification: Credit Ledger
 
 **Specification**: quick-consult-credit / credit-ledger
-**Version**: 1.1
+**Version**: 1.3
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-LEDGER
@@ -12,6 +12,8 @@
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §3.2, §6.1; Technical Architecture §6, §7.2, §9 | New specification |
 | 1.1 | Clarified QCC-LEDGER-003: amount/balance fields are whole-number credit points, not decimal monetary values | /speckit-clarify session 2026-09-15 (CLA-001, CLA-002) | Resolves prior open precision question for this specification |
+| 1.2 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.3 | Resolved QCC-LEDGER-002/003 casing note: UPPERCASE transaction-type values with `direction` as a first-class attribute are authoritative | /speckit-clarify session 2026-09-16 (CLA-006) | Removes prior open-casing caveat |
 
 ## Purpose
 
@@ -37,13 +39,13 @@ Defines the immutable, append-only transaction ledger that constitutes the autho
 **Acceptance Criteria**:
 - AC-1: Given any ledger entry, when its transaction type is inspected, then it is one of the four defined types and no other value.
 
-*Note*: Final casing/naming convention for these types is an open item — see [clarifications.md](./clarifications.md) CLA-006.
+*Note*: The authoritative transaction-type values are UPPERCASE (`PURCHASE`, `REDEEM`, `ADMIN_ADD`, `ADMIN_REMOVE`), per the Technical Architecture convention (resolved via [clarifications.md](../clarifications.md) CLA-006, resolved 2026-09-16 via /speckit-clarify session). This supersedes the SRS's lowercase naming convention.
 
 ### QCC-LEDGER-003 — Direction and balance snapshots
 
-**Statement (EARS)**: The system shall record, for every ledger entry, the movement direction (credit or debit), the account balance immediately before the movement, and the account balance immediately after the movement, expressed as whole-number credit points (no fractional/decimal value — see [clarifications.md](./clarifications.md) CLA-001, CLA-002, resolved 2026-09-15).
+**Statement (EARS)**: The system shall record, for every ledger entry, the movement direction (credit or debit) as a first-class `direction` attribute, the account balance immediately before the movement, and the account balance immediately after the movement, expressed as whole-number credit points (no fractional/decimal value — see [clarifications.md](../clarifications.md) CLA-001, CLA-002, resolved 2026-09-15). The `direction` attribute is authoritative per the Technical Architecture convention (resolved via CLA-006, resolved 2026-09-16).
 
-**Source**: Technical Architecture §7.2; Resolved clarification (CLA-001, CLA-002)
+**Source**: Technical Architecture §7.2; Resolved clarification (CLA-001, CLA-002, CLA-006)
 
 **Acceptance Criteria**:
 - AC-1: Given any ledger entry, when its fields are inspected, then `balance_after` equals `balance_before` plus the amount (for credit direction) or minus the amount (for debit direction), and all three values are whole numbers.
@@ -85,7 +87,7 @@ Defines the immutable, append-only transaction ledger that constitutes the autho
 
 **Acceptance Criteria**:
 - AC-1: Given a balance-changing operation, when it succeeds, then exactly one corresponding ledger entry exists.
-- AC-2: Given a balance-changing operation, when it fails at any stage, then neither the balance change nor the ledger entry is committed (see [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) QCC-DATA-003).
+- AC-2: Given a balance-changing operation, when it fails at any stage, then neither the balance change nor the ledger entry is committed (see [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) QCC-DATA-003).
 
 ### QCC-LEDGER-008 — No silent modification of history
 
@@ -108,6 +110,6 @@ Defines the immutable, append-only transaction ledger that constitutes the autho
 ## Related Specifications
 
 - [customer-credit-account.md](./customer-credit-account.md) — the materialized balance that ledger entries collectively reconcile to.
-- [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) — atomicity requirements referenced by QCC-LEDGER-007.
-- [audit-and-observability.md](./audit-and-observability.md) — audit use of ledger data.
-- [clarifications.md](./clarifications.md) — CLA-002 (precision, resolved), CLA-006 (naming/casing, open).
+- [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) — atomicity requirements referenced by QCC-LEDGER-007.
+- [audit-and-observability.md](../non-functional/audit-and-observability.md) — audit use of ledger data.
+- [clarifications.md](../clarifications.md) — CLA-002 (precision, resolved), CLA-006 (naming/casing, resolved).

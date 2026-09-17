@@ -1,7 +1,7 @@
 # Specification: Customer Dashboard
 
 **Specification**: quick-consult-credit / customer-dashboard
-**Version**: 1.0
+**Version**: 1.1
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-CUSTOMER
@@ -11,6 +11,7 @@
 | Version | Change | Source | Impact |
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §5.1; Technical Architecture §12 | New specification |
+| 1.1 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
 
 ## Purpose
 
@@ -85,5 +86,5 @@ Defines the customer-facing account dashboard for viewing Quick Consult Credit b
 
 - [customer-credit-account.md](./customer-credit-account.md) — the account fields displayed.
 - [credit-ledger.md](./credit-ledger.md) — the ledger entries displayed.
-- [configuration.md](./configuration.md) — QCC-CONFIG-004 (history page size).
-- [security-and-access-control.md](./security-and-access-control.md) — customer isolation model.
+- [configuration.md](../non-functional/configuration.md) — QCC-CONFIG-004 (history page size).
+- [security-and-access-control.md](../non-functional/security-and-access-control.md) — customer isolation model.

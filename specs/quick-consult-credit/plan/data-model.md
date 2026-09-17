@@ -1,6 +1,6 @@
 # Data Model: Quick Consult Credit
 
-**Input**: [spec.md](./spec.md) Key Entities; [customer-credit-account.md](./customer-credit-account.md); [credit-ledger.md](./credit-ledger.md); [research.md](./research.md) §2
+**Input**: [spec.md](../spec.md) Key Entities; [customer-credit-account.md](../functional/customer-credit-account.md); [credit-ledger.md](../functional/credit-ledger.md); [research.md](./research.md) §2
 
 **Purpose**: Define the entities, fields, relationships, validation rules, and state-transition behavior for the Quick Consult Credit persistence model, at a logical (not SQL-implementation) level, consistent with the architecture-boundary constraint that specifications and design artifacts do not prescribe SQL statements or ORM code.
 
@@ -8,7 +8,7 @@
 
 **Represents**: The current, materialized credit state for exactly one Magento customer (`qcc_customer_credit`).
 
-**Source requirements**: [customer-credit-account.md](./customer-credit-account.md) QCC-ACCOUNT-001 through QCC-ACCOUNT-008.
+**Source requirements**: [customer-credit-account.md](../functional/customer-credit-account.md) QCC-ACCOUNT-001 through QCC-ACCOUNT-008.
 
 | Field | Type | Nullable | Description |
 |---|---|---|---|
@@ -35,13 +35,13 @@
 
 **Represents**: A single immutable, append-only balance movement (`qcc_credit_transaction`).
 
-**Source requirements**: [credit-ledger.md](./credit-ledger.md) QCC-LEDGER-001 through QCC-LEDGER-009.
+**Source requirements**: [credit-ledger.md](../functional/credit-ledger.md) QCC-LEDGER-001 through QCC-LEDGER-009.
 
 | Field | Type | Nullable | Description |
 |---|---|---|---|
 | `entity_id` | integer (identity) | No | Primary key |
 | `customer_id` | integer | No | References the owning Customer Credit Account's customer |
-| `transaction_type` | enumerated string | No | One of: `PURCHASE`, `REDEEM`, `ADMIN_ADD`, `ADMIN_REMOVE` (QCC-LEDGER-002; casing per [clarifications.md](./clarifications.md) CLA-006, open — Architecture casing adopted as working default) |
+| `transaction_type` | enumerated string | No | One of: `PURCHASE`, `REDEEM`, `ADMIN_ADD`, `ADMIN_REMOVE` (QCC-LEDGER-002; UPPERCASE casing confirmed authoritative per [clarifications.md](../clarifications.md) CLA-006, resolved 2026-09-16) |
 | `direction` | enumerated string | No | `CREDIT` or `DEBIT` (QCC-LEDGER-003) |
 | `amount` | integer (positive) | No | Magnitude of the movement, in whole-number credit points |
 | `balance_before` | integer | No | Account balance immediately prior to this movement |
@@ -68,7 +68,7 @@
 
 **Represents**: The Magento catalog product customers purchase to acquire credit. This is an existing Magento entity (`catalog_product_entity` and related attribute tables) referenced by configuration, not a new persistence entity introduced by this feature.
 
-**Source requirements**: [product-configuration.md](./product-configuration.md) QCC-PROD-001 through QCC-PROD-008; [configuration.md](./configuration.md) QCC-CONFIG-002.
+**Source requirements**: [product-configuration.md](../functional/product-configuration.md) QCC-PROD-001 through QCC-PROD-008; [configuration.md](../non-functional/configuration.md) QCC-CONFIG-002.
 
 **Relevant attributes** (existing Magento product attributes, no schema change required):
 - Attribute set: Consultation Services.
@@ -81,12 +81,12 @@ Neither the Customer Credit Account nor the Credit Transaction entity has a disc
 ## Indexing Considerations (logical, not SQL-prescriptive)
 
 - Customer Credit Account: unique index on `customer_id` (QCC-ACCOUNT-001 uniqueness).
-- Credit Transaction: composite index supporting ordered, paginated retrieval by `customer_id` and creation order (QCC-LEDGER-009; [customer-dashboard.md](./customer-dashboard.md) QCC-CUSTOMER-004); unique index on `source_reference` where not null (purchase-posting idempotency).
+- Credit Transaction: composite index supporting ordered, paginated retrieval by `customer_id` and creation order (QCC-LEDGER-009; [customer-dashboard.md](../functional/customer-dashboard.md) QCC-CUSTOMER-004); unique index on `source_reference` where not null (purchase-posting idempotency).
 
 ## Traceability Summary
 
 | Entity | Governing sub-specification | Key requirement IDs |
 |---|---|---|
-| Customer Credit Account | [customer-credit-account.md](./customer-credit-account.md) | QCC-ACCOUNT-001…008 |
-| Credit Transaction | [credit-ledger.md](./credit-ledger.md) | QCC-LEDGER-001…009 |
-| Atomicity/consistency across both | [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) | QCC-DATA-001…008 |
+| Customer Credit Account | [customer-credit-account.md](../functional/customer-credit-account.md) | QCC-ACCOUNT-001…008 |
+| Credit Transaction | [credit-ledger.md](../functional/credit-ledger.md) | QCC-LEDGER-001…009 |
+| Atomicity/consistency across both | [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) | QCC-DATA-001…008 |

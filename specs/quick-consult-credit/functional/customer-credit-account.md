@@ -1,7 +1,7 @@
 # Specification: Customer Credit Account
 
 **Specification**: quick-consult-credit / customer-credit-account
-**Version**: 1.0
+**Version**: 1.2
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-ACCOUNT
@@ -11,6 +11,8 @@
 | Version | Change | Source | Impact |
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §3.2; Technical Architecture §6, §7.1, §9 | New specification |
+| 1.1 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.2 | Confirmed QCC-ACCOUNT-006/007: ADMIN_ADD/ADMIN_REMOVE are included in the lifetime credited/debited totals alongside PURCHASE/REDEEM | /speckit-clarify session 2026-09-16 (CLA-011) | Removes prior open-item language; behavior unchanged |
 
 ## Purpose
 
@@ -63,27 +65,29 @@ Defines the customer credit account: its cardinality, contents, invariants, and 
 **Acceptance Criteria**:
 - AC-1: Given the full ledger for a customer, when all ledger entries' movements are summed, then the sum equals the account's current balance.
 
-### QCC-ACCOUNT-006 — Lifetime credited total update rule
+### QCC-ACCOUNT-006 — Lifetime credited total update rule (ADMIN_ADD included, confirmed)
 
-**Statement (EARS)**: When a balance-changing operation with a CREDIT direction is successfully applied, the system shall increase the account's lifetime credited total by the operation's amount.
+**Statement (EARS)**: When a balance-changing operation with a CREDIT direction is successfully applied — whether PURCHASE or ADMIN_ADD — the system shall increase the account's lifetime credited total by the operation's amount.
 
-**Source**: Technical Architecture §9.1; Derived clarification — see [clarifications.md](./clarifications.md) CLA-011 for whether this includes ADMIN_ADD as well as PURCHASE.
+**Source**: Technical Architecture §9.1; Resolved clarification — see [clarifications.md](../clarifications.md) CLA-011 (resolved 2026-09-16 via /speckit-clarify session): ADMIN_ADD is confirmed to be included in the lifetime credited total alongside PURCHASE, per the Architecture convention.
 
 **Acceptance Criteria**:
 - AC-1: Given an account with lifetime credited total T, when a CREDIT-direction operation of amount A is successfully applied, then lifetime credited total becomes T + A.
+- AC-2: Given an ADMIN_ADD operation of amount A, when it is successfully applied, then the lifetime credited total increases by A, identically to a PURCHASE of the same amount.
 
-### QCC-ACCOUNT-007 — Lifetime debited total update rule
+### QCC-ACCOUNT-007 — Lifetime debited total update rule (ADMIN_REMOVE included, confirmed)
 
-**Statement (EARS)**: When a balance-changing operation with a DEBIT direction is successfully applied, the system shall increase the account's lifetime debited total by the operation's amount.
+**Statement (EARS)**: When a balance-changing operation with a DEBIT direction is successfully applied — whether REDEEM or ADMIN_REMOVE — the system shall increase the account's lifetime debited total by the operation's amount.
 
-**Source**: Technical Architecture §9.2; Derived clarification — see [clarifications.md](./clarifications.md) CLA-011 for whether this includes ADMIN_REMOVE as well as REDEEM.
+**Source**: Technical Architecture §9.2; Resolved clarification — see [clarifications.md](../clarifications.md) CLA-011 (resolved 2026-09-16 via /speckit-clarify session): ADMIN_REMOVE is confirmed to be included in the lifetime debited total alongside REDEEM, per the Architecture convention.
 
 **Acceptance Criteria**:
 - AC-1: Given an account with lifetime debited total T, when a DEBIT-direction operation of amount A is successfully applied, then lifetime debited total becomes T + A.
+- AC-2: Given an ADMIN_REMOVE operation of amount A, when it is successfully applied, then the lifetime debited total increases by A, identically to a REDEEM of the same amount.
 
 ### QCC-ACCOUNT-008 — No unauthorized account access
 
-**Statement (EARS)**: The system shall not disclose a customer's credit account state to any actor other than the account's own customer (self-access), an authorized administrator, or an authorized integration, as governed by [security-and-access-control.md](./security-and-access-control.md).
+**Statement (EARS)**: The system shall not disclose a customer's credit account state to any actor other than the account's own customer (self-access), an authorized administrator, or an authorized integration, as governed by [security-and-access-control.md](../non-functional/security-and-access-control.md).
 
 **Source**: SRS §5.1, §4.1; Technical Architecture §12
 
@@ -93,6 +97,6 @@ Defines the customer credit account: its cardinality, contents, invariants, and 
 ## Related Specifications
 
 - [credit-ledger.md](./credit-ledger.md) — the append-only movement records that back QCC-ACCOUNT-005.
-- [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) — atomicity and concurrency guarantees for account updates.
-- [security-and-access-control.md](./security-and-access-control.md) — access rules referenced by QCC-ACCOUNT-008.
-- [clarifications.md](./clarifications.md) — CLA-002 (precision, resolved), CLA-011 (admin adjustments vs. lifetime totals, open).
+- [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) — atomicity and concurrency guarantees for account updates.
+- [security-and-access-control.md](../non-functional/security-and-access-control.md) — access rules referenced by QCC-ACCOUNT-008.
+- [clarifications.md](../clarifications.md) — CLA-002 (precision, resolved), CLA-008 (no dedicated extension attribute for balance; access only via REST API/UI, resolved), CLA-011 (admin adjustments included in lifetime totals, resolved).

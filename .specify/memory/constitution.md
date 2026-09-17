@@ -1,32 +1,30 @@
 <!--
 Sync Impact Report
 ===================
-Version change: [TEMPLATE] → 1.0.0 (initial ratification)
-Modified principles: N/A (first adoption; no prior versioned constitution existed — the
-  file previously contained only the unfilled template scaffold)
+Version change: 1.3.0 → 1.4.0
+Modified principles: None
 Added sections:
-  - Core Principles I-XII (Code Quality and Architecture, Code Maintainability,
-    PHP and PSR Compliance, Testing Standards, User Experience Consistency,
-    Performance, Security and Data Handling, Magento Core Compatibility,
-    Configuration and Deployment Safety, Version Control and Feature Branches,
-    Quality Gates, Principle of Least Change)
-  - Reference Standards
-  - Acceptance Criteria
-  - Governance
-Removed sections: Generic template placeholders (5 example principles, 2 generic
-  sections) replaced with Magento/Adobe Commerce-specific governance content.
+  - XIII. Specification Organization — new principle requiring every feature under
+    `specs/<feature>/` to segregate functional and non-functional requirements into
+    `functional/` and `non-functional/` subfolders, planning artifacts into `plan/`,
+    execution artifacts into `tasks/`, and supporting artifacts (checklists, contracts,
+    other auxiliary documents) into their own dedicated subfolders, never mixed with
+    requirement `.md` files at the feature root.
+Removed sections: None
 Templates requiring alignment review:
-  - .specify/templates/plan-template.md ⚠ pending manual review for Magento-specific
-    Constitution Check gates (architecture, PSR, testing, UX, performance, security)
-  - .specify/templates/spec-template.md ⚠ pending manual review for testability /
-    UX-consistency language alignment
-  - .specify/templates/tasks-template.md ⚠ pending manual review to ensure task
-    categories reflect module/plugin/observer/test layering
-  - .specify/templates/checklist-template.md ⚠ pending manual review
+  - .specify/templates/spec-template.md ⚠ pending manual review to emit requirement
+    files under functional/ and non-functional/ subfolders instead of the feature root
+  - .specify/templates/plan-template.md ⚠ pending manual review to write plan.md and
+    Phase 0/1 design artifacts under plan/ instead of the feature root
+  - .specify/templates/tasks-template.md ⚠ pending manual review to write tasks.md
+    under tasks/ instead of the feature root
+  - .specify/templates/checklist-template.md ⚠ pending manual review for the
+    checklists/ subfolder placement (already dedicated, should remain compliant)
 Follow-up TODOs:
-  - TODO(RATIFICATION_DATE): Original historical adoption date is unknown; the
-    ratification date below has been set to the date this constitution was first
-    formally authored. Update if an earlier authoritative date is identified.
+  - Existing in-flight feature specs (e.g., specs/quick-consult-credit/) predate this
+    principle and currently use a flat root layout; they are not retroactively moved by
+    this amendment. A separate, explicit reorganization pass is required to bring them
+    into compliance.
 -->
 
 # Magento 2.4.8 (Adobe Commerce) Constitution
@@ -266,6 +264,26 @@ branch.
 THE feature branch SHALL remain synchronized with its intended base branch according to
 the project's branching strategy.
 
+WHEN a feature has an associated `tasks.md` produced by the Spec Kit workflow, THE
+implementation SHALL create one branch per phase defined in that feature's `tasks.md`
+(e.g., Setup, Foundational, each User Story phase, Polish & Cross-Cutting Concerns),
+rather than implementing all phases on a single undifferentiated feature branch.
+
+WHEN naming a phase branch, THE implementation SHALL derive the name from the feature
+branch and the phase identifier/title in `tasks.md` (e.g.,
+`<feature-branch>/phase-<N>-<phase-slug>`), so the branch is traceable back to its
+governing spec and phase.
+
+THE first phase branch (Setup) SHALL be based on the feature's intended base/target
+branch. Each subsequent phase branch SHALL be based on the prior required phase's branch
+once that phase's Checkpoint criteria (as stated in `tasks.md`) are satisfied,
+preserving the phase execution order and dependency chain defined in `tasks.md`.
+
+IF `tasks.md` explicitly marks multiple phases as independently parallelizable (for
+example, separate user-story phases that only depend on a shared Foundational
+checkpoint), THEN their phase branches MAY be created in parallel from that same
+completed prerequisite phase branch instead of sequentially from one another.
+
 WHEN changes are ready for integration, THE implementation SHALL contain focused commits
 that clearly represent logical changes.
 
@@ -278,8 +296,27 @@ of both the feature and the latest valid base-branch changes.
 BEFORE integration, THE feature branch SHALL pass applicable static analysis,
 coding-standard checks, unit tests, integration tests, and relevant functional tests.
 
+BEFORE a phase branch is merged into its base, THE implementation SHALL satisfy that
+phase's Checkpoint criteria as stated in `tasks.md`, in addition to the quality gates
+defined in Principle XI (Quality Gates).
+
+ONCE implementation of a phase or task is complete and has passed the Principle XI
+(Quality Gates) checks, THE implementation SHALL raise a pull request whose target
+branch is the owning EPIC branch, IF the phase or task belongs to an EPIC. IF no EPIC
+branch has been provided for that phase or task, THEN the pull request SHALL instead
+target the `dev` branch. THE implementation SHALL NOT raise a pull request against any
+other branch (e.g., directly against a production or release branch) without an
+explicitly documented exception.
+
 *Rationale*: Isolated, synchronized feature branches with focused commits keep history
-reviewable and make it possible to bisect regressions.
+reviewable and make it possible to bisect regressions. Aligning branch boundaries with
+the phases already defined in each spec's `tasks.md` keeps large multi-phase features
+reviewable as independently mergeable increments and turns each phase's Checkpoint
+criteria into an enforceable integration gate rather than an informal suggestion.
+Routing the pull request to the owning EPIC branch (or `dev` when no EPIC applies) keeps
+related phases/tasks consolidated for EPIC-level review before they reach the shared
+development line, while still guaranteeing every change lands somewhere reviewable when
+no EPIC exists.
 
 ### XI. Quality Gates
 WHEN a change is submitted for review, THE change SHALL satisfy the following minimum
@@ -289,6 +326,9 @@ quality gates:
 - Applicable PHP-FIG PSR compliance.
 - Magento coding-standard compliance.
 - Static analysis without unresolved critical errors.
+- SonarQube analysis without unresolved Blocker- or Critical-severity issues, and with
+  every newly introduced Security Hotspot reviewed and either resolved or explicitly
+  marked "Safe"/"Acknowledged" with a documented justification.
 - Appropriate automated test coverage.
 - No known regression in existing functionality.
 - UX consistency for customer-facing changes.
@@ -297,6 +337,13 @@ quality gates:
 - No direct modification of Magento core/vendor code.
 - Documentation updated when behavior, configuration, architecture, or public
   interfaces change.
+
+BEFORE any change is committed, THE implementation SHALL run a SonarQube analysis
+(SonarQube for IDE/Connected Mode or an equivalent scanner against the same rule set)
+over the modified files and SHALL resolve or explicitly justify every Blocker- and
+Critical-severity issue and every newly introduced Security Hotspot before the commit is
+made. THE implementation SHALL NOT commit changes solely to defer a failing SonarQube
+gate to a later commit.
 
 IF any mandatory quality gate fails, THEN the change SHALL NOT be considered
 production-ready until the failure is resolved or explicitly documented and approved as
@@ -307,7 +354,10 @@ backward-compatibility constraint, THEN the exception SHALL be documented with i
 rationale, impact, and mitigation.
 
 *Rationale*: A single, explicit checklist gives reviewers and automated CI a shared,
-unambiguous definition of "done" and "production-ready."
+unambiguous definition of "done" and "production-ready." Requiring the SonarQube gate
+before commit (not merely before merge) catches security hotspots, code smells, and
+reliability bugs at the point of authorship, when they are cheapest to fix, rather than
+accumulating them across a branch's full history of commits.
 
 ### XII. Principle of Least Change
 WHEN implementing a requirement, THE implementation SHALL make the smallest
@@ -322,6 +372,38 @@ avoid unrelated refactoring.
 
 *Rationale*: Minimizing blast radius reduces regression risk and keeps code review
 focused on the actual requirement being delivered.
+
+### XIII. Specification Organization
+WHEN a feature specification set is created or maintained under `specs/<feature>/`, THE
+specification set SHALL segregate individual functional requirement documents into a
+`functional/` subfolder and individual non-functional requirement documents into a
+`non-functional/` subfolder, rather than mixing requirement types at the feature root.
+
+THE specification set SHALL place all planning artifacts (the implementation plan and
+any Phase 0/1 design outputs such as research, data-model, and quickstart documents)
+under a `plan/` subfolder.
+
+THE specification set SHALL place all execution artifacts (`tasks.md` and any related
+task-breakdown documents) under a `tasks/` subfolder.
+
+THE specification set SHALL place supporting artifacts — including checklists,
+contracts, and other auxiliary documents — into their own dedicated subfolders (for
+example `checklists/`, `contracts/`), and SHALL NOT mix these supporting artifacts with
+requirement `.md` files at the feature root.
+
+THE feature root (`specs/<feature>/`) SHALL contain only the top-level index/overview
+document(s) (for example the master `spec.md` and `clarifications.md`) that link into
+the `functional/`, `non-functional/`, `plan/`, `tasks/`, and supporting-artifact
+subfolders; individual requirement, planning, execution, or supporting documents SHALL
+NOT reside directly at the feature root.
+
+*Rationale*: As a feature specification set grows to dozens of requirement documents,
+planning artifacts, tasks, and supporting material, a flat feature-root layout becomes
+difficult to navigate and increases the chance that a reviewer misses a document class
+entirely. Enforcing dedicated subfolders per artifact type keeps functional and
+non-functional concerns clearly separated, keeps planning/execution artifacts
+discoverable at a predictable path, and prevents supporting material (checklists,
+contracts) from being confused with normative requirement documents.
 
 ## Reference Standards
 
@@ -362,4 +444,4 @@ that violate a Core Principle unless an explicit, documented exception has been
 approved. Dependent templates (plan, spec, tasks, checklist) SHALL be reviewed for
 alignment whenever this constitution is amended, per the Sync Impact Report.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-12 | **Last Amended**: 2026-09-12
+**Version**: 1.4.0 | **Ratified**: 2026-09-12 | **Last Amended**: 2026-09-16

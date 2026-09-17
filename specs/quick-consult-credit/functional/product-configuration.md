@@ -1,7 +1,7 @@
 # Specification: Product Configuration
 
 **Specification**: quick-consult-credit / product-configuration
-**Version**: 1.1
+**Version**: 1.3
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-PROD
@@ -12,6 +12,8 @@
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §3.1; Technical Architecture §3, §10 | New specification |
 | 1.1 | Recorded resolved default qualifying condition (invoice generated / payment captured) in QCC-PROD-008 | /speckit-clarify session 2026-09-15 (CLA-003) | Clarifies default configuration value without removing configurability |
+| 1.2 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.3 | Fixed stale cross-reference: CLA-010 was already resolved 2026-09-16 but this file still read "open" | `/speckit-analyze` finding H1, 2026-09-16 | Cross-reference correction only; no requirement content changed |
 
 ## Purpose
 
@@ -86,17 +88,17 @@ Defines how Quick Consult Credit is represented and configured as a purchasable 
 
 **Statement (EARS)**: The system shall require an explicit, deployment-configured value defining the qualifying successful order/payment state. The default value of this configuration setting shall be "invoice generated (payment captured)"; this specification does not otherwise hardcode a single specific Magento order status as the qualifying condition, and deployments may override the default.
 
-**Source**: Technical Architecture §3, §10, §19; Resolved clarification (see [clarifications.md](./clarifications.md) CLA-003, resolved 2026-09-15)
+**Source**: Technical Architecture §3, §10, §19; Resolved clarification (see [clarifications.md](../clarifications.md) CLA-003, resolved 2026-09-15)
 
 **Rationale**: The SRS gives only an illustrative example ("e.g., invoice generated and order marked complete"); the Architecture explicitly defers this to project-specific configuration. The /speckit-clarify session established "invoice generated (payment captured)" as the default, while preserving deployment-time configurability.
 
 **Acceptance Criteria**:
-- AC-1: Given the module configuration, when the qualifying-condition setting is unset or invalid, then the system does not post any credit and records an operational error (see [configuration.md](./configuration.md) QCC-CONFIG-003).
+- AC-1: Given the module configuration, when the qualifying-condition setting is unset or invalid, then the system does not post any credit and records an operational error (see [configuration.md](../non-functional/configuration.md) QCC-CONFIG-003).
 - AC-2: Given the qualifying-condition setting is left at its default, when an order's invoice is generated (payment captured), then credit posting proceeds per QCC-PROD-007.
 - AC-3: Given the qualifying-condition setting is overridden to a different valid value, when an order reaches that configured state, then credit posting proceeds per QCC-PROD-007 using the overridden state instead.
 
 ## Related Specifications
 
 - [credit-purchase-posting.md](./credit-purchase-posting.md) — the posting mechanics, idempotency, and negative-case behavior once a qualifying condition is met.
-- [configuration.md](./configuration.md) — QCC-CONFIG-002 (attribute-set configuration), QCC-CONFIG-003 (qualifying condition configuration).
-- [clarifications.md](./clarifications.md) — CLA-001 (credit unit semantics, resolved), CLA-003 (exact qualifying state, resolved), CLA-010 (purchase reference granularity, open).
+- [configuration.md](../non-functional/configuration.md) — QCC-CONFIG-002 (attribute-set configuration), QCC-CONFIG-003 (qualifying condition configuration).
+- [clarifications.md](../clarifications.md) — CLA-001 (credit unit semantics, resolved), CLA-003 (exact qualifying state, resolved), CLA-010 (purchase reference granularity, resolved).

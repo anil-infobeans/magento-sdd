@@ -1,7 +1,7 @@
 # Specification: Configuration
 
 **Specification**: quick-consult-credit / configuration
-**Version**: 1.1
+**Version**: 1.2
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-CONFIG
@@ -12,6 +12,7 @@
 |---|---|---|---|
 | 1.0 | Initial creation | Technical Architecture §19; SRS §3.1, §5.1 | New specification |
 | 1.1 | Set default value for QCC-CONFIG-003 (qualifying condition) to "invoice generated (payment captured)" | /speckit-clarify session 2026-09-15 (CLA-003) | Establishes a concrete default while preserving deployment override |
+| 1.2 | Relocated to `non-functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
 
 ## Purpose
 
@@ -49,20 +50,20 @@ Defines the deployment-configurable behavior of Quick Consult Credit. No configu
 **Behavior when invalid/missing**: No order items qualify for credit posting; an operational error/warning is logged.
 
 **Acceptance Criteria**:
-- AC-1: Given the configuration references a valid attribute set/product, when a qualifying order for that product completes, then it is evaluated for posting per [credit-purchase-posting.md](./credit-purchase-posting.md).
+- AC-1: Given the configuration references a valid attribute set/product, when a qualifying order for that product completes, then it is evaluated for posting per [credit-purchase-posting.md](../functional/credit-purchase-posting.md).
 - AC-2: Given the configuration is missing or invalid, when any order is processed, then no Quick Consult Credit posting occurs.
 
 ### QCC-CONFIG-003 — Qualifying successful order/payment condition
 
 **Statement (EARS)**: The system shall provide a configuration setting defining which order/payment state qualifies for credit posting.
 
-**Source**: Technical Architecture §3, §10, §19; [clarifications.md](./clarifications.md) CLA-003 (resolved)
+**Source**: Technical Architecture §3, §10, §19; [clarifications.md](../clarifications.md) CLA-003 (resolved)
 
 **Purpose**: Allows the qualifying condition to match the project's actual checkout/payment lifecycle rather than an assumed state.
 **Allowed values**: A valid, deployment-supported order/payment state identifier.
 **Default**: "Invoice generated (payment captured)", resolved via /speckit-clarify session 2026-09-15. Deployments may override this default with a different valid order/payment state.
 **Validation**: Must reference a state that is reachable and observable within the project's order-processing lifecycle.
-**Runtime effect**: Order items reaching this state trigger evaluation for credit posting (see [product-configuration.md](./product-configuration.md) QCC-PROD-007/008).
+**Runtime effect**: Order items reaching this state trigger evaluation for credit posting (see [product-configuration.md](../functional/product-configuration.md) QCC-PROD-007/008).
 **Behavior when invalid/missing**: No credit posting occurs; an operational error is logged.
 
 **Acceptance Criteria**:
@@ -79,7 +80,7 @@ Defines the deployment-configurable behavior of Quick Consult Credit. No configu
 **Allowed values**: A positive integer.
 **Default**: 20 (per Technical Architecture §19, "20 or project standard").
 **Validation**: Must be a positive integer.
-**Runtime effect**: Controls page size used by [customer-dashboard.md](./customer-dashboard.md) QCC-CUSTOMER-004.
+**Runtime effect**: Controls page size used by [customer-dashboard.md](../functional/customer-dashboard.md) QCC-CUSTOMER-004.
 **Behavior when invalid/missing**: Falls back to the default of 20.
 
 **Acceptance Criteria**:
@@ -88,6 +89,6 @@ Defines the deployment-configurable behavior of Quick Consult Credit. No configu
 
 ## Related Specifications
 
-- [product-configuration.md](./product-configuration.md) — consumes QCC-CONFIG-002/003.
-- [customer-dashboard.md](./customer-dashboard.md) — consumes QCC-CONFIG-004.
-- [clarifications.md](./clarifications.md) — CLA-003 (qualifying condition default value, resolved).
+- [product-configuration.md](../functional/product-configuration.md) — consumes QCC-CONFIG-002/003.
+- [customer-dashboard.md](../functional/customer-dashboard.md) — consumes QCC-CONFIG-004.
+- [clarifications.md](../clarifications.md) — CLA-003 (qualifying condition default value, resolved).

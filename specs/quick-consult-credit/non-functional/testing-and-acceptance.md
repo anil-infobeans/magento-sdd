@@ -1,7 +1,7 @@
 # Specification: Testing, Acceptance, and Non-Functional Requirements
 
 **Specification**: quick-consult-credit / testing-and-acceptance
-**Version**: 1.0
+**Version**: 1.2
 **Status**: Draft
 **Type**: Normative (NFRs) + Architectural (test-strategy guidance)
 **Requirement ID prefix**: QCC-NFR
@@ -11,6 +11,8 @@
 | Version | Change | Source | Impact |
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §7.2; Technical Architecture §23, §24, §28 | New specification |
+| 1.1 | Relocated to `non-functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.2 | Resolved QCC-NFR-001: no formal performance/throughput SLA is required for this release (explicit decision, not a pending TBD); removed blocking sign-off language | /speckit-clarify session 2026-09-16 (CLA-012) | Removes a previously blocking implementation-sign-off item |
 
 ## Purpose
 
@@ -18,18 +20,14 @@ Converts qualitative expectations into measurable non-functional requirements wh
 
 ## Non-Functional Requirements
 
-### QCC-NFR-001 — Performance target: TBD
+### QCC-NFR-001 — No formal performance SLA for this release (resolved)
 
-**Statement (EARS)**: Performance target: TBD.
+**Statement (EARS)**: No formal performance or throughput SLA is required for this release. This is an explicit specification decision, not a pending/undefined item, and does not relax any correctness guarantee (e.g., [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) QCC-DATA-001, QCC-DATA-006).
 
-**Source**: Not defined in SRS or Technical Architecture.
-
-**Owner**: Business/architecture owner (see [clarifications.md](./clarifications.md) CLA-012).
-
-**Required before implementation sign-off**: Yes (for performance acceptance only; does not block functional implementation).
+**Source**: Resolved clarification; see [clarifications.md](../clarifications.md) CLA-012 (resolved 2026-09-16 via /speckit-clarify session)
 
 **Acceptance Criteria**:
-- AC-1: Given no target is yet defined, when performance test acceptance is evaluated, then it is explicitly marked as pending owner sign-off rather than assumed to pass.
+- AC-1: Given the absence of a formal performance SLA, when implementation sign-off is evaluated, then performance is not a blocking criterion for sign-off.
 
 ### QCC-NFR-002 — Reliability: atomicity and rollback
 
@@ -77,7 +75,7 @@ Converts qualitative expectations into measurable non-functional requirements wh
 | Magento functional | Successful purchase posts correct credit; failed/cancelled/non-qualifying orders do not post; customer dashboard; admin adjustments |
 | Regression | Checkout, customer account, admin customer edit, order processing, existing integrations |
 | Security | Cross-customer access attempts, unauthorized admin/API attempts, ACL enforcement |
-| Performance | Pending target per QCC-NFR-001 |
+| Performance | Not applicable — no formal SLA is required for this release (QCC-NFR-001) |
 
 ## Consolidated Acceptance Test Scenarios
 
@@ -100,7 +98,7 @@ Converts qualitative expectations into measurable non-functional requirements wh
 - Negative amount (QCC-REDEEM-005)
 - Unknown customer (QCC-REDEEM-008)
 - Unauthorized request (QCC-REDEEM-009)
-- Duplicate request (QCC-REDEEM-010)
+- Duplicate request — not deduplicated; MAY double-debit if independently validated (QCC-REDEEM-010)
 - Concurrent redemptions (QCC-REDEEM-011, QCC-REDEEM-012)
 
 ### Admin
@@ -126,8 +124,8 @@ Converts qualitative expectations into measurable non-functional requirements wh
 - Authorization (QCC-API-009, QCC-API-011)
 - Request validation (QCC-API-006)
 - Success responses (QCC-API-001, QCC-API-005, QCC-API-010)
-- Standardized errors (QCC-API-012, Error Contract in [credit-rest-api.md](./credit-rest-api.md))
-- Replay/idempotency (QCC-API-013)
+- Standardized errors (QCC-API-012, Error Contract in [credit-rest-api.md](../functional/credit-rest-api.md))
+- Replay/idempotency — no dedicated mechanism; validated independently per attempt (QCC-API-013)
 
 ### Data Integrity
 
@@ -147,5 +145,5 @@ Converts qualitative expectations into measurable non-functional requirements wh
 
 ## Related Specifications
 
-All sub-specifications listed in [spec.md](./spec.md#specification-index) contribute requirement IDs referenced above.
-[clarifications.md](./clarifications.md) — CLA-012 (performance targets).
+All sub-specifications listed in [spec.md](../spec.md#specification-index) contribute requirement IDs referenced above.
+[clarifications.md](../clarifications.md) — CLA-012 (performance targets, resolved: no formal SLA required).

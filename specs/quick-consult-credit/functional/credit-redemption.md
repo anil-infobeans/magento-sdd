@@ -1,7 +1,7 @@
 # Specification: Credit Redemption
 
 **Specification**: quick-consult-credit / credit-redemption
-**Version**: 1.1
+**Version**: 1.3
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-REDEEM
@@ -12,6 +12,8 @@
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §3.3.2, §4.2; Technical Architecture §9.2, §24, §28 | New specification |
 | 1.1 | Clarified QCC-REDEEM-009: authorized callers are limited to external integrations and Magento admins; customers cannot self-redeem | /speckit-clarify session 2026-09-15 (CLA-007) | Narrows the definition of "authorized caller" |
+| 1.2 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.3 | Resolved QCC-REDEEM-010: no dedicated replay/idempotency mechanism exists; a replayed request MAY double-debit if each attempt individually passes validation | /speckit-clarify session 2026-09-16 (CLA-004) | Narrows the guarantee previously implied by QCC-REDEEM-010 |
 
 ## Purpose
 
@@ -94,21 +96,22 @@ Defines valid and invalid redemption behavior, including the exact state transit
 
 ### QCC-REDEEM-009 — Unauthorized caller rejected
 
-**Statement (EARS)**: If the requesting caller is not an authorized external integration system or an authorized Magento admin, the system shall reject the request with an authorization error and shall not evaluate or disclose the customer's balance. A directly authenticated customer session is not, by itself, an authorized caller for redemption (resolved via [clarifications.md](./clarifications.md) CLA-007, resolved 2026-09-15).
+**Statement (EARS)**: If the requesting caller is not an authorized external integration system or an authorized Magento admin, the system shall reject the request with an authorization error and shall not evaluate or disclose the customer's balance. A directly authenticated customer session is not, by itself, an authorized caller for redemption (resolved via [clarifications.md](../clarifications.md) CLA-007, resolved 2026-09-15).
 
 **Source**: SRS §4.2; Technical Architecture §11.3; Resolved clarification (CLA-007)
 
 **Acceptance Criteria**:
 - AC-1: Given an unauthorized caller (including an authenticated customer acting on their own behalf), when a redemption is submitted, then the request is rejected with an authorization error, and the response does not disclose the customer's balance.
 
-### QCC-REDEEM-010 — Duplicate/replayed request does not double-debit
+### QCC-REDEEM-010 — Replayed request is not guaranteed to be deduplicated (resolved)
 
-**Statement (EARS)**: When a redemption request is replayed or retried for a request that has already been successfully processed, the system shall not apply a second debit for that same logical request.
+**Statement (EARS)**: The system does not implement a dedicated request-idempotency/deduplication mechanism for redemption requests. When a redemption request is replayed or retried after the original has already been successfully processed, the system shall validate the replayed request independently against the balance at that time; the replayed request MAY be accepted and produce an additional debit and REDEEM ledger entry if it individually passes standard validation (QCC-REDEEM-001 through QCC-REDEEM-008). This explicitly narrows the general duplicate-prevention expectation in SRS §7.2 for this endpoint. It does not affect or weaken the balance-never-negative guarantee (QCC-REDEEM-011, QCC-REDEEM-012) or purchase-posting idempotency (see [credit-purchase-posting.md](./credit-purchase-posting.md)).
 
-**Source**: SRS §7.2; Technical Architecture §28; Derived clarification (see [clarifications.md](./clarifications.md) CLA-004 for the exact replay-identity contract)
+**Source**: SRS §7.2 (narrowed); Technical Architecture §28; Resolved clarification (see [clarifications.md](../clarifications.md) CLA-004, resolved 2026-09-16 via /speckit-clarify session)
 
 **Acceptance Criteria**:
-- AC-1: Given a redemption request that already succeeded, when the same logical request is resubmitted, then the balance is not debited a second time and the ledger contains only the original REDEEM entry for that logical request.
+- AC-1: Given a redemption request that already succeeded, when the same logical request is resubmitted as a separate request, then it is validated independently and MAY be accepted (resulting in an additional debit and a new REDEEM ledger entry) if it individually passes validation; no dedicated mechanism prevents this.
+- AC-2: Given any individual redemption request (original or replayed), when it is processed, then standard validation (QCC-REDEEM-001 through QCC-REDEEM-008) still applies without exception, and the balance never becomes negative.
 
 ### QCC-REDEEM-011 — Concurrent redemption safety
 
@@ -132,5 +135,5 @@ Defines valid and invalid redemption behavior, including the exact state transit
 
 - [credit-ledger.md](./credit-ledger.md) — REDEEM entry structure.
 - [credit-rest-api.md](./credit-rest-api.md) — API contract for the create-transaction (redeem) endpoint.
-- [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) — concurrency-serialization requirements underlying QCC-REDEEM-011/012.
-- [clarifications.md](./clarifications.md) — CLA-004 (idempotency-key contract), CLA-007 (customer self-redemption authorization).
+- [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) — concurrency-serialization requirements underlying QCC-REDEEM-011/012.
+- [clarifications.md](../clarifications.md) — CLA-004 (no dedicated idempotency mechanism, resolved), CLA-007 (customer self-redemption authorization, resolved).

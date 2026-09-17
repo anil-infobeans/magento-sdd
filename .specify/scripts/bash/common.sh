@@ -216,17 +216,36 @@ get_feature_paths() {
         current_branch="${feature_dir_trimmed##*/}"
     fi
 
+    # Resolve artifact paths, falling back to the Constitution Principle XIII
+    # subfolder layout (plan/, tasks/) when the flat file is not present
+    # (issue: check-prerequisites.sh reported "plan.md not found" for features
+    # using the mandated plan/, tasks/ subfolder organization).
+    local impl_plan="$feature_dir/plan.md"
+    [[ ! -f "$impl_plan" && -f "$feature_dir/plan/plan.md" ]] && impl_plan="$feature_dir/plan/plan.md"
+
+    local tasks_file="$feature_dir/tasks.md"
+    [[ ! -f "$tasks_file" && -f "$feature_dir/tasks/tasks.md" ]] && tasks_file="$feature_dir/tasks/tasks.md"
+
+    local research_file="$feature_dir/research.md"
+    [[ ! -f "$research_file" && -f "$feature_dir/plan/research.md" ]] && research_file="$feature_dir/plan/research.md"
+
+    local data_model_file="$feature_dir/data-model.md"
+    [[ ! -f "$data_model_file" && -f "$feature_dir/plan/data-model.md" ]] && data_model_file="$feature_dir/plan/data-model.md"
+
+    local quickstart_file="$feature_dir/quickstart.md"
+    [[ ! -f "$quickstart_file" && -f "$feature_dir/plan/quickstart.md" ]] && quickstart_file="$feature_dir/plan/quickstart.md"
+
     # Use printf '%q' to safely quote values, preventing shell injection
     # via crafted branch names or paths containing special characters
     printf 'REPO_ROOT=%q\n' "$repo_root"
     printf 'CURRENT_BRANCH=%q\n' "$current_branch"
     printf 'FEATURE_DIR=%q\n' "$feature_dir"
     printf 'FEATURE_SPEC=%q\n' "$feature_dir/spec.md"
-    printf 'IMPL_PLAN=%q\n' "$feature_dir/plan.md"
-    printf 'TASKS=%q\n' "$feature_dir/tasks.md"
-    printf 'RESEARCH=%q\n' "$feature_dir/research.md"
-    printf 'DATA_MODEL=%q\n' "$feature_dir/data-model.md"
-    printf 'QUICKSTART=%q\n' "$feature_dir/quickstart.md"
+    printf 'IMPL_PLAN=%q\n' "$impl_plan"
+    printf 'TASKS=%q\n' "$tasks_file"
+    printf 'RESEARCH=%q\n' "$research_file"
+    printf 'DATA_MODEL=%q\n' "$data_model_file"
+    printf 'QUICKSTART=%q\n' "$quickstart_file"
     printf 'CONTRACTS_DIR=%q\n' "$feature_dir/contracts"
 }
 

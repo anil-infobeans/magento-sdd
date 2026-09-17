@@ -1,7 +1,7 @@
 # Specification: Admin Credit Management
 
 **Specification**: quick-consult-credit / admin-credit-management
-**Version**: 1.1
+**Version**: 1.2
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-ADMIN
@@ -12,6 +12,7 @@
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §5.2; Technical Architecture §13, §24 | New specification |
 | 1.1 | Updated test scenario table to whole-number credit points (removed dollar formatting) | /speckit-clarify session 2026-09-15 (CLA-001, CLA-002) | Terminology consistency only; no behavioral change |
+| 1.2 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
 
 ## Purpose
 
@@ -118,5 +119,5 @@ Defines the Magento Admin experience for viewing a customer's Quick Consult Cred
 ## Related Specifications
 
 - [credit-ledger.md](./credit-ledger.md) — ADMIN_ADD/ADMIN_REMOVE ledger entry structure.
-- [security-and-access-control.md](./security-and-access-control.md) — ACL model referenced by QCC-ADMIN-008/009.
-- [clarifications.md](./clarifications.md) — CLA-011 (admin adjustments vs. lifetime totals).
+- [security-and-access-control.md](../non-functional/security-and-access-control.md) — ACL model referenced by QCC-ADMIN-008/009.
+- [clarifications.md](../clarifications.md) — CLA-011 (admin adjustments vs. lifetime totals).

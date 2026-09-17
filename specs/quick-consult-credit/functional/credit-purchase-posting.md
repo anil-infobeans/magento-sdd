@@ -1,7 +1,7 @@
 # Specification: Credit Purchase Posting
 
 **Specification**: quick-consult-credit / credit-purchase-posting
-**Version**: 1.1
+**Version**: 1.3
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-PURCHASE
@@ -12,6 +12,8 @@
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §3.3.1; Technical Architecture §10, §24, §28 | New specification |
 | 1.1 | Confirmed quantity-based credit amount in QCC-PURCHASE-002 (removed open-ambiguity caveat) | /speckit-clarify session 2026-09-15 (CLA-001) | Removes reference to an unresolved clarification; behavior unchanged |
+| 1.2 | Relocated to `functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.3 | Confirmed QCC-PURCHASE-011: order-item-level granularity (`sales_order_item_id`) is the final deterministic purchase reference; confirmed QCC-PURCHASE-012 remains manual-correction-only | /speckit-clarify session 2026-09-16 (CLA-009, CLA-010) | Removes prior open-item language; behavior unchanged |
 
 ## Purpose
 
@@ -46,7 +48,7 @@ Qualifying purchase
 
 **Statement (EARS)**: The system shall determine the posted credit amount for a qualifying order item from that item's purchased quantity, where one unit of quantity equals one whole-number credit point.
 
-**Source**: SRS §3.1; Technical Architecture §10; Resolved clarification (see [clarifications.md](./clarifications.md) CLA-001, resolved 2026-09-15)
+**Source**: SRS §3.1; Technical Architecture §10; Resolved clarification (see [clarifications.md](../clarifications.md) CLA-001, resolved 2026-09-15)
 
 **Acceptance Criteria**:
 - AC-1: Given a qualifying order item with quantity Q, when credit is posted, then the PURCHASE ledger entry's amount equals Q credit points (a whole number, not a price-derived monetary value).
@@ -123,23 +125,23 @@ Qualifying purchase
 **Acceptance Criteria**:
 - AC-1: Given two independent processing attempts carrying the same purchase reference, when both are processed (even concurrently), then only one results in a posted ledger entry.
 
-### QCC-PURCHASE-011 — Idempotent posting via deterministic purchase reference
+### QCC-PURCHASE-011 — Idempotent posting via deterministic purchase reference (order-item granularity confirmed)
 
-**Statement (EARS)**: The system shall use a deterministic purchase reference (the qualifying order item) to determine whether a purchase has already been posted, without prescribing the underlying persistence mechanism.
+**Statement (EARS)**: The system shall use the qualifying order item (`sales_order_item_id`) as the deterministic purchase reference to determine whether a purchase has already been posted, without prescribing the underlying persistence mechanism. Order-item-level granularity is confirmed as the final, authoritative reference level (resolved via [clarifications.md](../clarifications.md) CLA-010, resolved 2026-09-16 via /speckit-clarify session).
 
-**Source**: Technical Architecture §7.2, §10; Derived clarification (see [clarifications.md](./clarifications.md) CLA-010)
-
-**Acceptance Criteria**:
-- AC-1: Given the same order item identifier, when posting is attempted multiple times, then the system consistently identifies prior posting and prevents duplication regardless of timing.
-
-### QCC-PURCHASE-012 — No automatic reversal on later cancellation/refund
-
-**Statement (EARS)**: The system shall not automatically reverse a previously posted PURCHASE credit if the originating order is later cancelled or refunded.
-
-**Source**: SRS §8.1 (out of scope); Technical Architecture §2, §26 (future extension point); [clarifications.md](./clarifications.md) CLA-009
+**Source**: Technical Architecture §7.2, §10; Resolved clarification (see [clarifications.md](../clarifications.md) CLA-010)
 
 **Acceptance Criteria**:
-- AC-1: Given a previously posted PURCHASE credit, when the originating order is subsequently cancelled or refunded, then the customer's balance and ledger are not automatically altered by that cancellation/refund event.
+- AC-1: Given the same order item identifier (`sales_order_item_id`), when posting is attempted multiple times, then the system consistently identifies prior posting and prevents duplication regardless of timing.
+
+### QCC-PURCHASE-012 — No automatic reversal on later cancellation/refund (manual-correction-only confirmed)
+
+**Statement (EARS)**: The system shall not automatically reverse a previously posted PURCHASE credit if the originating order is later cancelled or refunded. Correction, if needed, is confirmed to be manual-only via the existing Admin Remove Credit action; no automated reversal workflow is implemented (resolved via [clarifications.md](../clarifications.md) CLA-009, resolved 2026-09-16 via /speckit-clarify session).
+
+**Source**: SRS §8.1 (out of scope); Technical Architecture §2, §26 (future extension point); Resolved clarification (see [clarifications.md](../clarifications.md) CLA-009)
+
+**Acceptance Criteria**:
+- AC-1: Given a previously posted PURCHASE credit, when the originating order is subsequently cancelled or refunded, then the customer's balance and ledger are not automatically altered by that cancellation/refund event; any correction requires a manual Admin Remove Credit action.
 
 ## Test Scenarios (Given/When/Then summary)
 
@@ -157,5 +159,5 @@ Qualifying purchase
 
 - [product-configuration.md](./product-configuration.md) — product- and configuration-level preconditions for a qualifying purchase.
 - [credit-ledger.md](./credit-ledger.md) — ledger entry structure created by posting.
-- [data-integrity-and-concurrency.md](./data-integrity-and-concurrency.md) — atomicity and duplicate-prevention guarantees.
-- [clarifications.md](./clarifications.md) — CLA-001 (resolved), CLA-003 (resolved), CLA-009 (open, non-blocking), CLA-010 (open, non-blocking).
+- [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) — atomicity and duplicate-prevention guarantees.
+- [clarifications.md](../clarifications.md) — CLA-001 (resolved), CLA-003 (resolved), CLA-009 (resolved), CLA-010 (resolved).

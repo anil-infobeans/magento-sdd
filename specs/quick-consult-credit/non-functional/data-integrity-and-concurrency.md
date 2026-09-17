@@ -1,7 +1,7 @@
 # Specification: Data Integrity and Concurrency
 
 **Specification**: quick-consult-credit / data-integrity-and-concurrency
-**Version**: 1.0
+**Version**: 1.2
 **Status**: Draft
 **Type**: Normative
 **Requirement ID prefix**: QCC-DATA
@@ -11,6 +11,8 @@
 | Version | Change | Source | Impact |
 |---|---|---|---|
 | 1.0 | Initial creation | Quick Consult Credit SRS v1.0 §6.2, §7.2; Technical Architecture §9, §28 | New specification |
+| 1.1 | Relocated to `non-functional/` and updated cross-reference links | Constitution v1.4.0 Principle XIII, 2026-09-16 | Structural only; no requirement content changed |
+| 1.2 | Added clarifying cross-reference: CLA-004's resolution (no API-level replay/idempotency mechanism) does not weaken QCC-DATA-001 or QCC-DATA-006 | /speckit-clarify session 2026-09-16 (CLA-004) | Clarification only; no requirement text changed |
 
 ## Purpose
 
@@ -26,6 +28,8 @@ Defines the measurable invariants that protect balance and ledger correctness un
 
 **Acceptance Criteria**:
 - AC-1: Given any combination of concurrent redemption, admin-remove, and purchase operations, when all have been processed, then no customer's balance is observed to be negative at any point.
+
+*Note*: This invariant holds independently of the replay/idempotency resolution in [clarifications.md](../clarifications.md) CLA-004 (resolved 2026-09-16): even though a replayed create-transaction request MAY be accepted as an additional transaction if it individually passes validation, each individual acceptance is still subject to this balance-never-negative check, so a replay can never itself cause the balance to go negative.
 
 ### QCC-DATA-002 — One ledger movement per successful balance change
 
@@ -47,7 +51,7 @@ Defines the measurable invariants that protect balance and ledger correctness un
 
 ### QCC-DATA-004 — Ledger remains append-only after successful creation
 
-**Statement (EARS)**: The system shall not permit any operation to alter a ledger entry once it has been successfully created (duplicated from [credit-ledger.md](./credit-ledger.md) QCC-LEDGER-001 for cross-cutting integrity emphasis).
+**Statement (EARS)**: The system shall not permit any operation to alter a ledger entry once it has been successfully created (duplicated from [credit-ledger.md](../functional/credit-ledger.md) QCC-LEDGER-001 for cross-cutting integrity emphasis).
 
 **Source**: SRS §6.1; Technical Architecture §6
 
@@ -72,6 +76,8 @@ Defines the measurable invariants that protect balance and ledger correctness un
 **Acceptance Criteria**:
 - AC-1: Given concurrent redemption requests whose combined amount exceeds the balance at the start of processing, when all are processed, then the accepted subset's combined amount does not exceed that starting balance.
 
+*Note*: This guarantee is about total-amount-vs-balance correctness and is unaffected by CLA-004's resolution (no API-level replay/idempotency mechanism): a replayed request is simply one more request competing for the same serialized balance check, and this invariant still prevents it (or any other request) from causing double-spend beyond the available balance.
+
 ### QCC-DATA-007 — All balance-changing operations pass through the defined service boundary
 
 **Statement (EARS)**: The system shall require every balance-changing operation, regardless of initiating layer (customer UI, Admin UI, REST API, purchase-posting process), to pass through a single defined business/service-contract boundary.
@@ -92,6 +98,7 @@ Defines the measurable invariants that protect balance and ledger correctness un
 
 ## Related Specifications
 
-- [credit-ledger.md](./credit-ledger.md), [customer-credit-account.md](./customer-credit-account.md) — data structures protected by these invariants.
-- [credit-purchase-posting.md](./credit-purchase-posting.md), [credit-redemption.md](./credit-redemption.md), [admin-credit-management.md](./admin-credit-management.md) — operations governed by these invariants.
+- [credit-ledger.md](../functional/credit-ledger.md), [customer-credit-account.md](../functional/customer-credit-account.md) — data structures protected by these invariants.
+- [credit-purchase-posting.md](../functional/credit-purchase-posting.md), [credit-redemption.md](../functional/credit-redemption.md), [admin-credit-management.md](../functional/admin-credit-management.md) — operations governed by these invariants.
 - [testing-and-acceptance.md](./testing-and-acceptance.md) — concurrency and atomicity test scenarios.
+- [clarifications.md](../clarifications.md) — CLA-004 (no API-level replay/idempotency mechanism, resolved; does not weaken QCC-DATA-001/006).

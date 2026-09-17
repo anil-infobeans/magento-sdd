@@ -1,6 +1,6 @@
 # Contract: Service Interfaces
 
-**Input**: [data-integrity-and-concurrency.md](../data-integrity-and-concurrency.md) QCC-DATA-007/008; Technical Architecture §8 (Appendix A); [research.md](../research.md) §1–5
+**Input**: [data-integrity-and-concurrency.md](../non-functional/data-integrity-and-concurrency.md) QCC-DATA-007/008; Technical Architecture §8 (Appendix A); [research.md](../plan/research.md) §1–5
 
 **Purpose**: Define the logical service-contract boundary that every layer (customer UI, Admin UI, REST API, purchase-posting observer) must go through for balance-changing operations. This is a behavioral/interface-level contract, not a PHP implementation — no method bodies, SQL, or framework wiring are included here (see architecture-boundary constraint in [spec.md](../spec.md)).
 
@@ -49,7 +49,7 @@
 |---|---|---|
 | Post purchase | qualifying order/order-item reference | If not already posted for this reference: determine credit amount from quantity, invoke Transaction Management's credit operation with `source_reference` = the order item reference, `source = SYSTEM`. If already posted: no-op (idempotent skip) |
 
-**Consumers**: `OrderCreditPost` observer (triggered on the configured qualifying event — see [research.md](../research.md) §4).
+**Consumers**: `OrderCreditPost` observer (triggered on the configured qualifying event — see [research.md](../plan/research.md) §4).
 
 ## Data Contracts (field-level, not class-level)
 
