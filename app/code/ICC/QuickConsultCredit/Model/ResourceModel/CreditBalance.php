@@ -48,8 +48,7 @@ class CreditBalance extends AbstractDb
     }
 
     /**
-     * Load a customer's credit account row with a pessimistic (`SELECT ... FOR UPDATE`) lock,
-     * for use exclusively inside an already-open database transaction (QCC-DATA-001/003/006).
+     * Load a customer's credit account row with a pessimistic lock for an open transaction (QCC-DATA-001/003/006).
      *
      * @param \Magento\Framework\Model\AbstractModel $object
      * @param int $customerId

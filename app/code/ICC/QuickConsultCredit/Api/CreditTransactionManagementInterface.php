@@ -91,5 +91,10 @@ interface CreditTransactionManagementInterface
      * @throws \ICC\QuickConsultCredit\Model\Service\Exception\InsufficientBalanceException
      * @throws \ICC\QuickConsultCredit\Model\Service\Exception\CustomerNotFoundException
      */
-    public function createTransaction($customerId = null, $transactionType = null, $amount = null, ?string $message = null): CreditTransactionResultInterface;
+    public function createTransaction(
+        $customerId = null,
+        $transactionType = null,
+        $amount = null,
+        ?string $message = null
+    ): CreditTransactionResultInterface;
 }

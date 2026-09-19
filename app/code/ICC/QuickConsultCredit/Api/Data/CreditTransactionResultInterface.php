@@ -19,26 +19,36 @@ namespace ICC\QuickConsultCredit\Api\Data;
 interface CreditTransactionResultInterface
 {
     /**
+     * Get the unique identifier of the ledger transaction created by this request.
+     *
      * @return int
      */
     public function getTransactionId(): int;
 
     /**
+     * Get the transaction type (e.g. PURCHASE, REDEEM).
+     *
      * @return string
      */
     public function getType(): string;
 
     /**
+     * Get the amount, in whole-number credit points, that was applied.
+     *
      * @return int
      */
     public function getAmount(): int;
 
     /**
+     * Get the customer's balance immediately before this transaction was applied.
+     *
      * @return int
      */
     public function getPreviousBalance(): int;
 
     /**
+     * Get the customer's balance immediately after this transaction was applied.
+     *
      * @return int
      */
     public function getCurrentBalance(): int;

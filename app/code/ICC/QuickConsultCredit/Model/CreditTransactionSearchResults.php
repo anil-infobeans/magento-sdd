@@ -26,6 +26,7 @@ class CreditTransactionSearchResults extends SearchResults implements CreditTran
      *
      * @return CreditTransactionInterface[]
      */
+    // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
     public function getItems(): array
     {
         return parent::getItems();
@@ -37,6 +38,7 @@ class CreditTransactionSearchResults extends SearchResults implements CreditTran
      * @param CreditTransactionInterface[] $items
      * @return $this
      */
+    // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
     public function setItems(array $items)
     {
         return parent::setItems($items);

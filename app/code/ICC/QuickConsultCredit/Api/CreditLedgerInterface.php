@@ -26,7 +26,10 @@ interface CreditLedgerInterface
      * @param SearchCriteriaInterface $searchCriteria
      * @return CreditTransactionSearchResultsInterface
      */
-    public function getList(int $customerId, SearchCriteriaInterface $searchCriteria): CreditTransactionSearchResultsInterface;
+    public function getList(
+        int $customerId,
+        SearchCriteriaInterface $searchCriteria
+    ): CreditTransactionSearchResultsInterface;
 
     /**
      * Get a single ledger entry by its identifier, scoped strictly to $customerId.

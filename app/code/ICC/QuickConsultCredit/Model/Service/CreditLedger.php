@@ -78,8 +78,10 @@ class CreditLedger implements CreditLedgerInterface
     /**
      * @inheritDoc
      */
-    public function getList(int $customerId, SearchCriteriaInterface $searchCriteria): CreditTransactionSearchResultsInterface
-    {
+    public function getList(
+        int $customerId,
+        SearchCriteriaInterface $searchCriteria
+    ): CreditTransactionSearchResultsInterface {
         $collection = $this->collectionFactory->create();
         // Forced, non-overridable customer scope (QCC-SEC-004) — applied before any
         // caller-supplied SearchCriteria filter.

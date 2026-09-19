@@ -62,8 +62,7 @@ class CreditTransaction extends AbstractDb
     }
 
     /**
-     * Whether a PURCHASE transaction has already been posted for this deterministic
-     * reference (QCC-PURCHASE-001/009/010/011).
+     * Whether a PURCHASE transaction was already posted for this reference (QCC-PURCHASE-001/009/010/011).
      *
      * @param string $sourceReference
      * @return bool

@@ -194,8 +194,12 @@ class CreditTransactionManagement implements CreditTransactionManagementInterfac
     /**
      * @inheritDoc
      */
-    public function createTransaction($customerId = null, $transactionType = null, $amount = null, ?string $message = null): CreditTransactionResultInterface
-    {
+    public function createTransaction(
+        $customerId = null,
+        $transactionType = null,
+        $amount = null,
+        ?string $message = null
+    ): CreditTransactionResultInterface {
         try {
             $transaction = $this->doCreateTransaction($customerId, $transactionType, $amount, $message);
         } catch (CreditApiExceptionInterface $e) {
@@ -226,14 +230,20 @@ class CreditTransactionManagement implements CreditTransactionManagementInterfac
     }
 
     /**
+     * Validate the raw REST request payload and delegate to the REDEEM debit flow.
+     *
      * @param mixed $customerId
      * @param mixed $transactionType
      * @param mixed $amount
      * @param string|null $message
      * @return CreditTransactionInterface
      */
-    private function doCreateTransaction($customerId, $transactionType, $amount, ?string $message): CreditTransactionInterface
-    {
+    private function doCreateTransaction(
+        $customerId,
+        $transactionType,
+        $amount,
+        ?string $message
+    ): CreditTransactionInterface {
         // QCC-API-019: missing required field -> INVALID_REQUEST (evaluated before any
         // value-level check, per the fixed precedence order in QCC-API-012).
         if ($customerId === null || $transactionType === null || $amount === null) {
@@ -290,6 +300,8 @@ class CreditTransactionManagement implements CreditTransactionManagementInterfac
     }
 
     /**
+     * Apply a single ledger movement to the customer's balance and persist the transaction record.
+     *
      * @param int $customerId
      * @param int $amount
      * @param string $transactionType
@@ -381,6 +393,8 @@ class CreditTransactionManagement implements CreditTransactionManagementInterfac
     }
 
     /**
+     * Find the previously posted transaction for a deterministic purchase reference, if any.
+     *
      * @param string $sourceReference
      * @return CreditTransactionInterface|null
      */

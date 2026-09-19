@@ -67,7 +67,11 @@ class ModuleConfig
      */
     public function getQualifyingCondition($storeId = null): string
     {
-        $value = $this->scopeConfig->getValue(self::XML_PATH_QUALIFYING_CONDITION, ScopeInterface::SCOPE_STORE, $storeId);
+        $value = $this->scopeConfig->getValue(
+            self::XML_PATH_QUALIFYING_CONDITION,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
         return $value !== null && $value !== ''
             ? (string) $value
             : \ICC\QuickConsultCredit\Model\Config\Source\QualifyingCondition::INVOICE_GENERATED;
@@ -81,7 +85,11 @@ class ModuleConfig
      */
     public function getHistoryPageSize($storeId = null): int
     {
-        $value = (int) $this->scopeConfig->getValue(self::XML_PATH_HISTORY_PAGE_SIZE, ScopeInterface::SCOPE_STORE, $storeId);
+        $value = (int) $this->scopeConfig->getValue(
+            self::XML_PATH_HISTORY_PAGE_SIZE,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
         return $value > 0 ? $value : self::DEFAULT_HISTORY_PAGE_SIZE;
     }
 }

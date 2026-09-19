@@ -47,7 +47,10 @@ class TransactionValidator
     {
         $requiresReason = in_array(
             $transactionType,
-            [CreditTransactionInterface::TRANSACTION_TYPE_ADMIN_ADD, CreditTransactionInterface::TRANSACTION_TYPE_ADMIN_REMOVE],
+            [
+                CreditTransactionInterface::TRANSACTION_TYPE_ADMIN_ADD,
+                CreditTransactionInterface::TRANSACTION_TYPE_ADMIN_REMOVE,
+            ],
             true
         );
 

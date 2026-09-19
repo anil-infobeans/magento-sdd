@@ -59,6 +59,8 @@ interface CreditBalanceInterface
     public function getTotalCredited(): int;
 
     /**
+     * Set the lifetime cumulative CREDIT-direction total (QCC-ACCOUNT-006, QCC-ADMIN-002).
+     *
      * @param int $totalCredited
      * @return $this
      */
@@ -72,6 +74,8 @@ interface CreditBalanceInterface
     public function getTotalDebited(): int;
 
     /**
+     * Set the lifetime cumulative DEBIT-direction total (QCC-ACCOUNT-007, QCC-ADMIN-002).
+     *
      * @param int $totalDebited
      * @return $this
      */
